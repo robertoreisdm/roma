@@ -1,0 +1,12 @@
+=========================================================
+RReis — Guia Rápido de Instalação na Tela Inicial
+=========================================================
+
+OPÇÃO 1: ARQUIVO DIRETO (OFFLINE NO CELULAR OU PC)
+1. Abra o arquivo `index.html` (ou `RReis_App.html`) diretamente no navegador do celular (Chrome no Android ou Safari no iOS).
+2. No Android (Chrome): Toque nos 3 pontinhos (⋮) -> "Adicionar à tela inicial".
+3. No iPhone (App Atalhos / Safari): Abra o app "Atalhos" (Shortcuts) -> "+" -> "Abrir Arquivo" -> selecione o `index.html` -> toque no menu superior e escolha "Adicionar à Tela de Início".
+
+OPÇÃO 2: INSTALAÇÃO PWA COMPLETA (COM ÍCONE NATIVO E MODO TELA CHEIA)
+1. Suba esta pasta gratuitamente no GitHub Pages, Netlify Drop (app.netlify.com/drop) ou Vercel.
+2. Acesse o link gerado pelo celular e toque em "Instalar Aplicativo" / "Adicionar à Tela de Início".
