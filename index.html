@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="">
+<html lang="pt-BR" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -401,6 +401,43 @@
       border-color: #d8b4fe !important;
     }
 
+
+    /* Complete Light & Dark Mode coverage for Option 7 Command Center elements */
+    html:not(.dark) #option7-floating-dock {
+      background: rgba(255, 255, 255, 0.92) !important;
+      border-color: #d8b4fe !important;
+      box-shadow: 0 16px 36px -10px rgba(88, 28, 135, 0.18) !important;
+    }
+    html:not(.dark) #option7-floating-dock span,
+    html:not(.dark) #option7-floating-dock button {
+      color: #3b0764 !important;
+    }
+    html:not(.dark) #mobile-command-drawer > div {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border-color: #d8b4fe !important;
+      color: #181a1f !important;
+    }
+    html:not(.dark) #spotify-mini-player {
+      background: rgba(255, 255, 255, 0.96) !important;
+      border-color: #a855f7 !important;
+      color: #181a1f !important;
+      box-shadow: 0 20px 40px -12px rgba(88, 28, 135, 0.25) !important;
+    }
+    html:not(.dark) [class*="bg-purple-950"] {
+      background-color: #f3e8ff !important;
+      border-color: #d8b4fe !important;
+      color: #581c87 !important;
+    }
+    html:not(.dark) .text-purple-200,
+    html:not(.dark) .text-purple-300,
+    html:not(.dark) .text-purple-400 {
+      color: #6b21a8 !important;
+    }
+    html:not(.dark) nav.md\:hidden {
+      background: rgba(255, 255, 255, 0.96) !important;
+      border-color: #e4e7ec !important;
+    }
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row bg-[#060d1a] text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200">
@@ -427,8 +464,8 @@
         <button type="button" onclick="openProfileSwitchModal()" class="focus-ring p-2 rounded-full bg-purple-950/90 border border-purple-600/50 text-purple-300" title="Trocar Perfil" aria-label="Trocar Perfil">
           <i data-lucide="users" class="w-4 h-4"></i>
         </button>
-        <button type="button" onclick="toggleDarkMode()" class="focus-ring p-2 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300" aria-label="Alternar Modo Escuro">
-          <i data-lucide="moon" class="w-4 h-4" id="mobile-theme-icon"></i>
+        <button type="button" id="mobile-theme-btn" onclick="toggleDarkMode()" class="focus-ring p-2 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300" aria-label="Alternar Modo Escuro" title="Alternar Modo Escuro / Claro">
+          <i data-lucide="sun" class="w-4 h-4" id="mobile-theme-icon"></i>
         </button>
         <button type="button" onclick="openInstallModal()" class="focus-ring p-2 rounded-full bg-cyan-600 text-white" aria-label="Baixar e Instalar no Celular" title="Baixar e adicionar à tela inicial">
           <i data-lucide="download" class="w-4 h-4"></i>
@@ -3364,6 +3401,25 @@
        ===================================================== -->
   <script>
     const STORAGE_KEY = 'roma_app_v1_state';
+    var currentProfileId = 'profile_1';
+    var profilesManifest = [
+      { id: 'profile_1', name: 'Meu Perfil (Eng. Comp.)', course: 'Engenharia de Computação • 2º Período', role: 'eng', photo: '' },
+      { id: 'profile_2', name: 'Namorada (Direito UEMG)', course: 'Direito • 6º Período (UEMG Frutal)', role: 'law', photo: '' }
+    ];
+    var readingTimerSec = 0;
+    var readingTimerRunning = false;
+    var readingTimerInterval = null;
+    var finishedSessionMinutes = 0;
+    var selectedCalendarDayStr = '2026-11-12';
+    var miniPlayerDismissed = false;
+    var activeMiniPlayerMode = null;
+    var studyTimerSec = 0;
+    var studyTimerRunning = false;
+    var studyTimerInterval = null;
+    var studyChartInstance = null;
+    var cloudSyncDebounce = null;
+    var initialCloudSyncCompleted = false;
+
 
     // Default initial state tailored for a 2nd-semester Computer Engineering student
     function getDefaultState() {
@@ -3501,22 +3557,141 @@
       });
     }
 
-    async function saveToIndexedDB(dataObj) {
+    function countStateUserRecords(st) {
+      if (!st || typeof st !== 'object') return 0;
+      let count = 0;
+      const arrKeys = [
+        'pdfs', 'books', 'notes', 'folders', 'schedule', 'grades',
+        'exerciseBank', 'customGoals', 'readingLogs', 'readBooks',
+        'wishlistBooks', 'favoriteQuotes', 'studySubjectsBank',
+        'studySessions', ' lawEntries'
+      ];
+      arrKeys.forEach(k => {
+        const cleanK = k.trim();
+        if (Array.isArray(st[cleanK])) count += st[cleanK].length;
+      });
+      if (st.goalCalendarLogs && typeof st.goalCalendarLogs === 'object') {
+        count += Object.keys(st.goalCalendarLogs).length;
+      }
+      if (st.workoutWeeks && typeof st.workoutWeeks === 'object') {
+        Object.values(st.workoutWeeks).forEach(w => {
+          if (w && Array.isArray(w.exercises)) count += w.exercises.length;
+          if (w && Array.isArray(w.cardio)) count += w.cardio.length;
+        });
+      }
+      if (st.currentBook && st.currentBook.title && st.currentBook.title.trim()) count += 2;
+      if (st.profile && st.profile.name && !['Estudante', 'Meu Perfil (Eng. Comp.)', 'Namorada (Direito UEMG)'].includes(st.profile.name)) {
+        count += 2;
+      }
+      if (st.profile && st.profile.photo) count += 2;
+      return count;
+    }
+
+    function mergeArraysById(arrA, arrB) {
+      const a = Array.isArray(arrA) ? arrA : [];
+      const b = Array.isArray(arrB) ? arrB : [];
+      if (a.length === 0) return b;
+      if (b.length === 0) return a;
+      const map = new Map();
+      b.forEach((item, idx) => {
+        const key = (item && item.id) ? String(item.id) : `idx_b_${idx}_${JSON.stringify(item)}`;
+        map.set(key, item);
+      });
+      a.forEach((item, idx) => {
+        const key = (item && item.id) ? String(item.id) : `idx_a_${idx}_${JSON.stringify(item)}`;
+        map.set(key, item);
+      });
+      return Array.from(map.values());
+    }
+
+    function mergeProfileStates(newerSt, olderSt) {
+      if (!olderSt || typeof olderSt !== 'object') return newerSt;
+      if (!newerSt || typeof newerSt !== 'object') return olderSt;
+      const merged = Object.assign({}, getDefaultState(), olderSt, newerSt);
+
+      const arrayFields = [
+        'pdfs', 'books', 'notes', 'folders', 'schedule', 'grades',
+        'exerciseBank', 'customGoals', 'readingLogs', 'readBooks',
+        'wishlistBooks', 'favoriteQuotes', 'studySubjectsBank',
+        'studySessions', 'coupleSharedGoals', 'lawEntries'
+      ];
+      arrayFields.forEach(field => {
+        merged[field] = mergeArraysById(newerSt[field], olderSt[field]);
+      });
+
+      // Strip legacy demo grade IDs
+      if (Array.isArray(merged.grades)) {
+        merged.grades = merged.grades.filter(g => g && !['g-1', 'g-2', 'g-3', 'g-4', 'g-5'].includes(g.id));
+      }
+
+      // Merge goalCalendarLogs
+      merged.goalCalendarLogs = Object.assign({}, olderSt.goalCalendarLogs || {}, newerSt.goalCalendarLogs || {});
+
+      // Merge scheduleByPeriod
+      merged.scheduleByPeriod = Object.assign({}, olderSt.scheduleByPeriod || {}, newerSt.scheduleByPeriod || {});
+
+      // Merge workoutSplits
+      const splitsSet = new Set([...(olderSt.workoutSplits || []), ...(newerSt.workoutSplits || [])]);
+      merged.workoutSplits = Array.from(splitsSet);
+
+      // Merge workoutWeeks
+      const wkMerged = Object.assign({}, olderSt.workoutWeeks || {});
+      Object.entries(newerSt.workoutWeeks || {}).forEach(([wkName, wkData]) => {
+        if (!wkMerged[wkName]) {
+          wkMerged[wkName] = wkData;
+        } else {
+          wkMerged[wkName] = {
+            exercises: mergeArraysById(wkData.exercises, wkMerged[wkName].exercises),
+            cardio: mergeArraysById(wkData.cardio, wkMerged[wkName].cardio)
+          };
+        }
+      });
+      merged.workoutWeeks = wkMerged;
+
+      // Merge currentBook (prefer non-empty title & highest page progress)
+      const cbNew = newerSt.currentBook || {};
+      const cbOld = olderSt.currentBook || {};
+      merged.currentBook = {
+        title: (cbNew.title && cbNew.title.trim()) ? cbNew.title : (cbOld.title || ''),
+        currentPage: Math.max(Number(cbNew.currentPage) || 0, Number(cbOld.currentPage) || 0),
+        totalPages: Number(cbNew.totalPages) || Number(cbOld.totalPages) || 300
+      };
+
+      // Merge profile (prefer non-default customized fields)
+      const pNew = newerSt.profile || {};
+      const pOld = olderSt.profile || {};
+      const defaultNames = ['Estudante', 'Meu Perfil (Eng. Comp.)', 'Namorada (Direito UEMG)'];
+      merged.profile = Object.assign({}, getDefaultState().profile, pOld, pNew);
+      if (defaultNames.includes(pNew.name) && pOld.name && !defaultNames.includes(pOld.name)) {
+        merged.profile.name = pOld.name;
+      }
+      if (!pNew.photo && pOld.photo) merged.profile.photo = pOld.photo;
+      if (!pNew.university && pOld.university) merged.profile.university = pOld.university;
+      if (!pNew.bio && pOld.bio) merged.profile.bio = pOld.bio;
+      if (!pNew.github && pOld.github) merged.profile.github = pOld.github;
+
+      merged._updatedAt = Math.max(Number(newerSt._updatedAt) || 0, Number(olderSt._updatedAt) || 0, Date.now());
+      return merged;
+    }
+
+    async function saveToIndexedDB(dataObj, profId = currentProfileId) {
       try {
         const db = await openRReisDB();
         if (!db) return;
         const tx = db.transaction('store', 'readwrite');
-        tx.objectStore('store').put(JSON.stringify(dataObj), STORAGE_KEY);
+        const key = getStorageKeyForProfile(profId);
+        tx.objectStore('store').put(JSON.stringify(dataObj), key);
       } catch (e) {}
     }
 
-    async function loadFromIndexedDB() {
+    async function loadFromIndexedDB(profId = currentProfileId) {
       try {
         const db = await openRReisDB();
         if (!db) return null;
         return await new Promise((resolve) => {
           const tx = db.transaction('store', 'readonly');
-          const req = tx.objectStore('store').get(STORAGE_KEY);
+          const key = getStorageKeyForProfile(profId);
+          const req = tx.objectStore('store').get(key);
           req.onsuccess = () => {
             if (req.result) {
               try { resolve(JSON.parse(req.result)); } catch (e) { resolve(null); }
@@ -3535,14 +3710,13 @@
       if (!parsed || typeof parsed !== 'object') return;
       const defaults = getDefaultState();
       state = Object.assign({}, defaults, parsed);
-      // Respect user deletions of arrays (even if empty array [])
       if (Array.isArray(parsed.pdfs)) state.pdfs = parsed.pdfs;
       if (Array.isArray(parsed.books)) state.books = parsed.books;
       if (Array.isArray(parsed.notes)) state.notes = parsed.notes;
       if (Array.isArray(parsed.folders)) state.folders = parsed.folders;
       if (Array.isArray(parsed.schedule)) state.schedule = parsed.schedule;
       if (Array.isArray(parsed.grades)) {
-        // Strip legacy pre-populated default subjects ({ id: 'g-1' }, { id: 'g-2' }, { id: 'g-3' }, { id: 'g-4' }, { id: 'g-5' }) so only user-added subjects remain
+        // Strip legacy demo subjects: { id: 'g-1' }, { id: 'g-2' }, { id: 'g-3' }, { id: 'g-4' }, { id: 'g-5' }
         state.grades = parsed.grades.filter(g => !['g-1', 'g-2', 'g-3', 'g-4', 'g-5'].includes(g.id));
       }
       if (Array.isArray(parsed.exerciseBank)) state.exerciseBank = parsed.exerciseBank;
@@ -3578,34 +3752,58 @@
           }
         });
       });
+
+      const currentKey = getCurrentSchedulePeriodKey();
+      if (!state.scheduleByPeriod[currentKey] && state.schedule && state.schedule.length > 0) {
+        state.scheduleByPeriod[currentKey] = state.schedule.map(it => Object.assign({ color: getDefaultCategoryColor(it.category) }, it));
+      } else if (state.scheduleByPeriod[currentKey]) {
+        state.schedule = state.scheduleByPeriod[currentKey];
+      }
+
+      // Respect explicit theme choice (defaults to Dark Mode true)
+      const savedThemePref = localStorage.getItem('roma_theme_v2');
+      if (savedThemePref === 'dark' || savedThemePref === 'light') {
+        state.darkMode = (savedThemePref === 'dark');
+      } else {
+        state.darkMode = true;
+      }
+      state._profileId = currentProfileId;
     }
 
     async function loadState() {
       let candidates = [];
+      const profKey = getStorageKeyForProfile(currentProfileId);
+
       try {
-        if (window.__RREIS_EMBEDDED_STATE__ && typeof window.__RREIS_EMBEDDED_STATE__ === 'object') {
-          candidates.push(window.__RREIS_EMBEDDED_STATE__);
+        const rawProf = localStorage.getItem(profKey);
+        if (rawProf) {
+          const p = JSON.parse(rawProf);
+          if (p && (!p._profileId || p._profileId === currentProfileId)) candidates.push(p);
         }
       } catch (e) {}
 
-      try {
-        const raw = localStorage.getItem(getStorageKeyForProfile(currentProfileId)) || localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsedLocal = JSON.parse(raw);
-          if (parsedLocal) candidates.push(parsedLocal);
-        }
-      } catch (e) {}
+      if (currentProfileId === 'profile_1') {
+        try {
+          const rawLegacy = localStorage.getItem(STORAGE_KEY);
+          if (rawLegacy) {
+            const p = JSON.parse(rawLegacy);
+            if (p && (!p._profileId || p._profileId === 'profile_1')) candidates.push(p);
+          }
+        } catch (e) {}
+      }
 
       try {
         if (window.name && window.name.startsWith('ROMA_STATE:')) {
           const parsedName = JSON.parse(window.name.slice('ROMA_STATE:'.length));
-          if (parsedName) candidates.push(parsedName);
+          if (parsedName && parsedName._profileId === currentProfileId) candidates.push(parsedName);
         }
       } catch (e) {}
 
       try {
-        const idbData = await loadFromIndexedDB();
-        if (idbData) candidates.push(idbData);
+        const idbData = await loadFromIndexedDB(currentProfileId);
+        if (idbData && (!idbData._profileId || idbData._profileId === currentProfileId)) {
+          candidates.push(idbData);
+        }
       } catch (e) {}
 
       try {
@@ -3614,39 +3812,43 @@
           const vaultData = await window.pageVault.load('roma.state');
           if (vaultData) {
             const parsedVault = typeof vaultData === 'string' ? JSON.parse(vaultData) : vaultData;
-            if (parsedVault) candidates.push(parsedVault);
-          }
-          if (typeof window.pageVault.onRestore === 'function') {
-            window.pageVault.onRestore((restored) => {
-              if (restored) {
-                const parsedRestored = typeof restored === 'string' ? JSON.parse(restored) : restored;
-                if (parsedRestored) {
-                  applyLoadedState(parsedRestored);
-                  applyTheme();
-                  switchTab(state.activeTab || 'home');
-      if (new Date().getDay() === 0) { setTimeout(openSundayRecapModal, 600); }
-                }
-              }
-            });
+            if (parsedVault && (!parsedVault._profileId || parsedVault._profileId === currentProfileId)) {
+              candidates.push(parsedVault);
+            }
           }
         }
       } catch (e) {}
 
       if (candidates.length > 0) {
-        // Pick the most recently saved candidate based on _updatedAt timestamp
-        candidates.sort((a, b) => (Number(b._updatedAt) || 0) - (Number(a._updatedAt) || 0));
-        applyLoadedState(candidates[0]);
+        // Sort candidates prioritizing those that actually have user records, then by _updatedAt
+        candidates.sort((a, b) => {
+          const countA = countStateUserRecords(a);
+          const countB = countStateUserRecords(b);
+          if (countA > 0 && countB === 0) return -1;
+          if (countB > 0 && countA === 0) return 1;
+          return (Number(b._updatedAt) || 0) - (Number(a._updatedAt) || 0);
+        });
+        // Merge all candidates for this profile so no local record is ever lost
+        let combined = candidates[0];
+        for (let i = 1; i < candidates.length; i++) {
+          combined = mergeProfileStates(combined, candidates[i]);
+        }
+        applyLoadedState(combined);
       } else {
         state = getDefaultState();
+        state._profileId = currentProfileId;
       }
     }
 
-    function saveState() {
+    function saveState(skipCloud = false) {
       state._updatedAt = Date.now();
+      state._profileId = currentProfileId;
       const serialized = JSON.stringify(state);
       try {
-        localStorage.setItem(STORAGE_KEY, serialized);
         localStorage.setItem(getStorageKeyForProfile(currentProfileId), serialized);
+        if (currentProfileId === 'profile_1') {
+          localStorage.setItem(STORAGE_KEY, serialized);
+        }
       } catch (e) {}
       try {
         window.name = 'ROMA_STATE:' + serialized;
@@ -3655,7 +3857,7 @@
         window.__RREIS_EMBEDDED_STATE__ = JSON.parse(serialized);
       } catch (e) {}
       try {
-        saveToIndexedDB(state);
+        saveToIndexedDB(state, currentProfileId);
       } catch (e) {}
       try {
         if (window.pageVault) {
@@ -3672,7 +3874,9 @@
         sumEl.textContent = `${state.activeWorkoutWeek} • Volume: ${totalVol.toLocaleString('pt-BR')} kg • Salvo ✓ (${timeStr})`;
       }
       updateBadgesAndKPIs();
-      scheduleCloudPush();
+      if (!skipCloud) {
+        scheduleCloudPush();
+      }
     }
 
     function showToast(msg, type = 'info') {
@@ -3752,34 +3956,51 @@
       if (tabId === 'law') renderLawTab();
       if (tabId === 'profile') renderProfile();
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     
     function applyTheme() {
+      const savedThemePref = localStorage.getItem('roma_theme_v2');
+      if (savedThemePref === 'dark' || savedThemePref === 'light') {
+        state.darkMode = (savedThemePref === 'dark');
+      } else if (typeof state.darkMode !== 'boolean') {
+        state.darkMode = true;
+      }
       const isDark = Boolean(state.darkMode);
       document.documentElement.classList.toggle('dark', isDark);
-      const lbl = document.getElementById('theme-toggle-label');
-      if (lbl) lbl.textContent = isDark ? 'Modo Claro' : 'Modo Escuro';
+      if (document.body) document.body.classList.toggle('dark', isDark);
+
       const btn = document.getElementById('theme-toggle-btn');
       if (btn) {
         btn.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}" class="w-3.5 h-3.5"></i><span id="theme-toggle-label">${isDark ? 'Modo Claro' : 'Modo Escuro'}</span>`;
       }
-      const mobIcon = document.getElementById('mobile-theme-icon');
-      if (mobIcon) {
-        mobIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+      const mobBtn = document.getElementById('mobile-theme-btn');
+      if (mobBtn) {
+        mobBtn.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}" class="w-4 h-4" id="mobile-theme-icon"></i>`;
+      } else {
+        const mobIcon = document.getElementById('mobile-theme-icon');
+        if (mobIcon) mobIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
       }
+
       if (state.activeTab === 'workouts') {
         setTimeout(updateWorkoutChart, 40);
       }
-      if (window.lucide) lucide.createIcons();
+      if (state.activeTab === 'study') {
+        setTimeout(updateStudyChart, 40);
+      }
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function toggleDarkMode() {
-      state.darkMode = !state.darkMode;
-      saveState();
+      const currentlyDark = document.documentElement.classList.contains('dark');
+      state.darkMode = !currentlyDark;
+      try {
+        localStorage.setItem('roma_theme_v2', state.darkMode ? 'dark' : 'light');
+      } catch (e) {}
       applyTheme();
-      showToast(state.darkMode ? 'Modo Escuro ativado' : 'Modo Claro (Arquitetural) ativado');
+      saveState();
+      showToast(state.darkMode ? 'Modo Escuro (Roxo Roma) ativado!' : 'Modo Claro ativado!');
     }
 
     function toggleHighContrastFont() {
@@ -3973,7 +4194,7 @@
         }).join('');
       }
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     // ==========================================
@@ -4162,7 +4383,7 @@
         }
       }
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     // PDF Reader Functions
@@ -4179,7 +4400,7 @@
 
       renderPdfViewport();
       document.getElementById('pdf-reader-modal').classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function renderPdfViewport() {
@@ -4358,7 +4579,7 @@
       document.getElementById('upload-file-input').value = '';
       toggleUploadFields();
       document.getElementById('upload-modal').classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
     function closeUploadModal() {
       document.getElementById('upload-modal').classList.add('hidden');
@@ -4564,7 +4785,7 @@
     function openSplitManagerModal() {
       renderSplitManagerList();
       document.getElementById('split-manager-modal').classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function closeSplitManagerModal() {
@@ -4813,7 +5034,7 @@
         `).join('');
       }
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function toggleExerciseDone(exId) {
@@ -5220,7 +5441,7 @@
             </div>
           `;
         }).join('');
-        if (window.lucide) lucide.createIcons();
+        if (window.lucide) window.lucide.createIcons();
         return;
       }
 
@@ -5277,7 +5498,7 @@
         `;
       }).join('');
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function openScheduleModal(editId = null, defaultDay = 'Segunda') {
@@ -5398,11 +5619,10 @@
 
 
     // ==========================================
-    // SUPABASE CLOUD SYNC ENGINE (TEMPO REAL ENTRE APARELHOS)
+    // SUPABASE CLOUD SYNC ENGINE (TEMPO REAL ENTRE APARELHOS + PROTEÇÃO ANTI-PERDA)
     // ==========================================
     const SUPABASE_URL = 'https://hekuzxekogampnylpzft.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_9jn67ZzEnMNF1X73r--Bxw_IsmeK4Zv';
-
 
     function setCloudStatus(text, ok = true) {
       const lbl = document.getElementById('cloud-sync-label');
@@ -5423,10 +5643,10 @@
       }, extra);
     }
 
-    async function pushProfileToSupabase(profId, profState) {
-      if (!SUPABASE_URL || !SUPABASE_KEY) return;
+    async function pushProfileToSupabase(profId, profState, isExplicitReset = false) {
+      if (!SUPABASE_URL || !SUPABASE_KEY || !profId || !profState) return;
       try {
-        setCloudStatus('Salvando na nuvem...', false);
+        setCloudStatus('Salvando no Supabase...', false);
         const payload = {
           profile_id: profId,
           display_name: (profState.profile && profState.profile.name) || profId,
@@ -5435,16 +5655,31 @@
         };
         const res = await fetch(`${SUPABASE_URL}/rest/v1/roma_profiles?on_conflict=profile_id`, {
           method: 'POST',
+          keepalive: true,
           headers: supabaseHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
           body: JSON.stringify(payload)
         });
         if (res.ok) {
-          setCloudStatus('Salvo na Nuvem ✓', true);
+          setCloudStatus('Salvo no Supabase ✓', true);
+          // Also save an automatic rolling backup in Supabase whenever the profile has real user data
+          if (countStateUserRecords(profState) > 0 && !profId.endsWith('__backup')) {
+            fetch(`${SUPABASE_URL}/rest/v1/roma_profiles?on_conflict=profile_id`, {
+              method: 'POST',
+              keepalive: true,
+              headers: supabaseHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+              body: JSON.stringify({
+                profile_id: `${profId}__backup`,
+                display_name: `${(profState.profile && profState.profile.name) || profId} (Backup Automático)`,
+                state_json: profState,
+                updated_at: new Date().toISOString()
+              })
+            }).catch(() => {});
+          }
         } else {
           setCloudStatus('Salvo Localmente (Verifique SQL)', false);
         }
       } catch (e) {
-        setCloudStatus('Offline (Salvo Localmente)', false);
+        setCloudStatus('Offline (Salvo no Aparelho)', false);
       }
     }
 
@@ -5453,6 +5688,7 @@
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/roma_profiles?on_conflict=profile_id`, {
           method: 'POST',
+          keepalive: true,
           headers: supabaseHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
           body: JSON.stringify({
             profile_id: '__manifest__',
@@ -5465,28 +5701,37 @@
     }
 
     async function pullAllProfilesFromSupabase() {
-      if (!SUPABASE_URL || !SUPABASE_KEY) return [];
+      if (!SUPABASE_URL || !SUPABASE_KEY) return { ok: false, rows: [] };
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/roma_profiles?select=profile_id,display_name,state_json,updated_at`, {
           method: 'GET',
+          cache: 'no-store',
           headers: supabaseHeaders()
         });
-        if (!res.ok) return [];
+        if (!res.ok) return { ok: false, rows: [] };
         const rows = await res.json();
-        return Array.isArray(rows) ? rows : [];
+        return { ok: true, rows: Array.isArray(rows) ? rows : [] };
       } catch (e) {
-        return [];
+        return { ok: false, rows: [] };
       }
     }
 
     async function syncAllFromSupabase(showFeedback = false) {
       setCloudStatus('Sincronizando...', false);
-      const rows = await pullAllProfilesFromSupabase();
-      if (!rows || rows.length === 0) {
-        // First time: push local active profile up to Supabase
+      const result = await pullAllProfilesFromSupabase();
+      if (!result.ok) {
+        // Offline or in sandbox: enable local operation without overwriting cloud
+        initialCloudSyncCompleted = true;
+        setCloudStatus('Modo Local / Offline ✓', false);
+        return;
+      }
+
+      const rows = result.rows;
+      if (rows.length === 0) {
+        initialCloudSyncCompleted = true;
         await pushManifestToSupabase();
         await pushProfileToSupabase(currentProfileId, state);
-        if (showFeedback) showToast('Conectado ao Supabase! Dados iniciais enviados para a nuvem.', 'success');
+        if (showFeedback) showToast('Conectado ao Supabase! Dados enviados para a nuvem.', 'success');
         return;
       }
 
@@ -5504,51 +5749,73 @@
         saveProfilesManifest();
       }
 
-      // 2. Sync each profile snapshot into localStorage if cloud _updatedAt is newer
+      // 2. Non-destructively merge each profile with its cloud row (and any __backup row)
+      const profileIds = new Set(profilesManifest.map(p => p.id));
       rows.forEach(r => {
-        if (r.profile_id === '__manifest__' || !r.state_json) return;
-        const cloudState = r.state_json;
-        const cloudTs = Number(cloudState._updatedAt) || 0;
-        let localTs = 0;
-        try {
-          const rawLocal = localStorage.getItem(getStorageKeyForProfile(r.profile_id));
-          if (rawLocal) localTs = Number(JSON.parse(rawLocal)._updatedAt) || 0;
-        } catch (e) {}
-
-        let localHasData = false;
-        try {
-          const rawL = localStorage.getItem(getStorageKeyForProfile(r.profile_id));
-          if (rawL) {
-            const pL = JSON.parse(rawL);
-            localHasData = Boolean((pL.books && pL.books.length) || (pL.notes && pL.notes.length) || (pL.readingLogs && pL.readingLogs.length) || (pL.studySessions && pL.studySessions.length) || (pL.pdfs && pL.pdfs.length));
-          }
-        } catch (e) {}
-        const cloudHasData = Boolean((cloudState.books && cloudState.books.length) || (cloudState.notes && cloudState.notes.length) || (cloudState.readingLogs && cloudState.readingLogs.length) || (cloudState.studySessions && cloudState.studySessions.length) || (cloudState.pdfs && cloudState.pdfs.length));
-
-        if (cloudTs > localTs || (cloudHasData && !localHasData)) {
-          try {
-            localStorage.setItem(getStorageKeyForProfile(r.profile_id), JSON.stringify(cloudState));
-          } catch (e) {}
-          if (r.profile_id === currentProfileId) {
-            applyLoadedState(cloudState);
-          }
+        if (r.profile_id && r.profile_id !== '__manifest__' && !r.profile_id.endsWith('__backup')) {
+          profileIds.add(r.profile_id);
         }
       });
+
+      for (const profId of profileIds) {
+        const mainRow = rows.find(r => r.profile_id === profId);
+        const backupRow = rows.find(r => r.profile_id === `${profId}__backup`);
+        let cloudState = (mainRow && mainRow.state_json) ? mainRow.state_json : null;
+        if (backupRow && backupRow.state_json) {
+          cloudState = cloudState ? mergeProfileStates(cloudState, backupRow.state_json) : backupRow.state_json;
+        }
+
+        let localState = null;
+        try {
+          const rawLocal = localStorage.getItem(getStorageKeyForProfile(profId));
+          if (rawLocal) localState = JSON.parse(rawLocal);
+        } catch (e) {}
+
+        if (cloudState && localState) {
+          const cloudTs = Number(cloudState._updatedAt) || 0;
+          const localTs = Number(localState._updatedAt) || 0;
+          const newer = cloudTs >= localTs ? cloudState : localState;
+          const older = cloudTs >= localTs ? localState : cloudState;
+          const merged = mergeProfileStates(newer, older);
+          merged._profileId = profId;
+          try {
+            localStorage.setItem(getStorageKeyForProfile(profId), JSON.stringify(merged));
+          } catch (e) {}
+          if (profId === currentProfileId) {
+            applyLoadedState(merged);
+          }
+          // Push merged state back up so cloud has the complete union
+          await pushProfileToSupabase(profId, merged);
+        } else if (cloudState && !localState) {
+          cloudState._profileId = profId;
+          try {
+            localStorage.setItem(getStorageKeyForProfile(profId), JSON.stringify(cloudState));
+          } catch (e) {}
+          if (profId === currentProfileId) {
+            applyLoadedState(cloudState);
+          }
+        } else if (!cloudState && localState) {
+          await pushProfileToSupabase(profId, localState);
+        }
+      }
 
       initialCloudSyncCompleted = true;
       setCloudStatus('Nuvem Sincronizada ✓', true);
       syncProfileUI();
+      applyTheme();
       renderMultiProfilesGrid();
       const activeTab = state.activeTab || 'home';
       if (activeTab === 'home') renderHome();
+      if (activeTab === 'dashboard') renderDashboard();
       if (activeTab === 'couple') renderCoupleTab();
       if (activeTab === 'reading') renderReading();
       if (activeTab === 'study') { renderStudyTab(); updateStudyChart(); }
-      if (activeTab === 'workouts') renderWorkouts();
+      if (activeTab === 'workouts') { renderWorkouts(); updateWorkoutChart(); }
       if (activeTab === 'schedule') renderSchedule();
       if (activeTab === 'academic') renderAcademic();
       if (activeTab === 'law') renderLawTab();
-      if (showFeedback) showToast('Todos os perfis sincronizados com o Supabase!', 'success');
+      if (activeTab === 'profile') renderProfile();
+      if (showFeedback) showToast('Todos os dados e perfis sincronizados com o Supabase!', 'success');
     }
 
     function scheduleCloudPush() {
@@ -5556,7 +5823,7 @@
       clearTimeout(cloudSyncDebounce);
       cloudSyncDebounce = setTimeout(() => {
         if (initialCloudSyncCompleted) pushProfileToSupabase(currentProfileId, state);
-      }, 850);
+      }, 600);
     }
 
     // ==========================================
@@ -5681,11 +5948,12 @@
         }
       }
 
-      saveState();
+      saveState(false);
       syncProfileUI();
       applyTheme();
       renderMultiProfilesGrid();
-      switchTab('home');
+      switchTab(state.activeTab || 'home');
+      syncAllFromSupabase(false);
       showToast(`Perfil alterado para "${state.profile.name}"!`, 'success');
     }
 
@@ -5778,7 +6046,7 @@
         }).join('');
       }
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function openProfileSwitchModal() {
@@ -5867,7 +6135,7 @@
       renderMultiProfilesGrid();
       renderCustomGoals();
       renderGoalsCalendars();
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function saveProfileChanges(showFeedback = false) {
@@ -5984,7 +6252,7 @@
       if (stBooks) stBooks.textContent = (state.readBooks || []).length;
       if (stLogic) stLogic.textContent = (state.logicChallenges || []).filter(c => c.solved).length + '/' + (state.logicChallenges || []).length;
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     // ==========================================
@@ -6210,7 +6478,7 @@
     // ==========================================
     // CRONÔMETRO DE LEITURA COM FINALIZAÇÃO E REGISTRO AUTOMÁTICO
     // ==========================================
-    let finishedSessionMinutes = 1;
+    finishedSessionMinutes = 1;
 
     function finishReadingStopwatchSession() {
       clearInterval(readingTimerInterval);
@@ -6233,7 +6501,7 @@
 
       updateFinishModalSpeedPreview();
       document.getElementById('finish-reading-modal').classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function updateFinishModalSpeedPreview() {
@@ -6277,7 +6545,7 @@
     // ==========================================
     // METAS PESSOAIS PERSONALIZÁVEIS & CALENDÁRIO AUTOMÁTICO
     // ==========================================
-    let selectedCalendarDayStr = '2026-11-11';
+
 
     function addCustomPersonalGoal() {
       const titleInp = document.getElementById('new-custom-goal-title');
@@ -6431,7 +6699,7 @@
           </div>
         `;
       }).join('');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function setGoalStatusOnDate(goalId, dateStr, isMet) {
@@ -6486,7 +6754,7 @@
       if (titleEl) titleEl.textContent = `Metas do Dia ${dayPad}/11/2026`;
       renderDayGoalsModalContent();
       document.getElementById('day-goals-modal').classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function renderDayGoalsModalContent() {
@@ -6655,7 +6923,7 @@
         if (mobRestoreBtn) mobRestoreBtn.classList.add('hidden');
         if (dskRestoreBtn) dskRestoreBtn.classList.add('hidden');
       }
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function dismissMiniPlayerKeepRunning() {
@@ -6938,7 +7206,7 @@
           </div>
         `;
       }
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
     function quickTogglePartnerProfile() {
       if (profilesManifest.length < 2) {
@@ -6965,7 +7233,7 @@
           `;
         }).join('');
       }
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function handleCommandBarSubmit(rawQuery) {
@@ -7090,7 +7358,7 @@
         if (view) view.classList.toggle('hidden', k !== sub);
       });
       renderReadingExtras();
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function saveCurrentBookProgress() {
@@ -7295,7 +7563,7 @@
         if (btn) btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> <span>Continuar Estudo</span>`;
       }
       syncSpotifyMiniPlayer();
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function updateStudyTimerDisplay() {
@@ -7314,7 +7582,7 @@
       syncSpotifyMiniPlayer();
       const btn = document.getElementById('study-timer-start-btn');
       if (btn) btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> <span>Iniciar Estudo</span>`;
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function finishAndLogStudyTimer() {
@@ -7430,7 +7698,7 @@
         }
       }
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function updateStudyChart() {
@@ -7593,7 +7861,7 @@
           `;
         }).join('');
       }
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function addSharedCoupleGoal() {
@@ -7697,7 +7965,7 @@
           </div>
         `).join('');
       }
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     // ==========================================
@@ -7758,7 +8026,7 @@
       if (cKmEl) cKmEl.textContent = `${cKm.toFixed(1)} km na semana`;
 
       document.getElementById('sunday-recap-modal').classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function closeSundayRecapModal() {
@@ -7777,7 +8045,7 @@
         }
       }
       document.getElementById('google-hub-modal').classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function closeGoogleHubModal() {
@@ -8010,7 +8278,7 @@
         }
       }
 
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function addDailyReadingLog() {
@@ -8206,7 +8474,7 @@
       }
 
       renderLogicTrainer();
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function updateGradeField(gId, field, val) {
@@ -8397,7 +8665,7 @@
         clearInterval(pomoInterval);
         if (btn) btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5"></i> <span>Continuar</span>`;
       }
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function togglePomodoroMini() {
@@ -8412,7 +8680,7 @@
       updatePomodoroDisplay();
       const btn = document.getElementById('sidebar-pomo-btn');
       if (btn) btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5"></i> <span>Iniciar</span>`;
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function switchPomodoroMode() {
@@ -8431,7 +8699,7 @@
 
     function openInstallModal() {
       document.getElementById('install-modal').classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     }
     function closeInstallModal() {
       document.getElementById('install-modal').classList.add('hidden');
@@ -8522,7 +8790,7 @@
       switchTab(state.activeTab || 'home');
       if (new Date().getDay() === 0) { setTimeout(openSundayRecapModal, 600); }
       updatePomodoroDisplay();
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
       initMiniPlayerSwipeGesture();
       syncSpotifyMiniPlayer();
       syncAllFromSupabase(false);
@@ -8530,7 +8798,7 @@
       if ('caches' in window) {
         caches.keys().then(keys => {
           keys.forEach(k => {
-            if (k !== 'roma-pwa-v5') caches.delete(k).catch(() => {});
+            if (k !== 'roma-pwa-v6') caches.delete(k).catch(() => {});
           });
         }).catch(() => {});
       }
