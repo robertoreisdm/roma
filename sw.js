@@ -1,4 +1,4 @@
-const CACHE_NAME = 'roma-pwa-v7';
+const CACHE_NAME = 'roma-pwa-v8';
 const ASSETS = ['./index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', (event) => {
