@@ -2262,7 +2262,43 @@
   </main>
 
   <!-- MOBILE BOTTOM NAVIGATION BAR -->
-    <!-- =====================================================
+  
+  <!-- =====================================================
+       OPÇÃO 7: DOCK VERTICAL TRANSLÚCIDO FLUTUANTE NA DIREITA (COMO NA IMAGEM 7)
+       ===================================================== -->
+  <aside id="option7-floating-dock" class="fixed right-2.5 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center py-3 px-1.5 rounded-3xl bg-[#16102c]/80 backdrop-blur-2xl border border-purple-500/40 shadow-2xl gap-2.5 transition-all duration-300">
+    <button type="button" onclick="toggleOption7DockCollapse()" class="w-8 h-6 rounded-xl flex items-center justify-center text-purple-300 hover:text-white" title="Recolher / Expandir Dock Lateral">
+      <i data-lucide="equal" class="w-4 h-4"></i>
+    </button>
+    <div id="option7-dock-items" class="flex flex-col items-center gap-2.5">
+      <button type="button" onclick="switchTab('home')" class="flex flex-col items-center justify-center w-12 py-1.5 rounded-2xl hover:bg-purple-600/30 text-purple-200 transition">
+        <i data-lucide="inbox" class="w-4 h-4 text-purple-400"></i>
+        <span class="text-[9px] font-medium mt-0.5">Command</span>
+      </button>
+      <button type="button" onclick="switchTab('study')" class="flex flex-col items-center justify-center w-12 py-1.5 rounded-2xl hover:bg-purple-600/30 text-slate-300 transition">
+        <i data-lucide="folder-kanban" class="w-4 h-4 text-purple-400"></i>
+        <span class="text-[9px] font-medium mt-0.5">Estudos</span>
+      </button>
+      <button type="button" onclick="switchTab('reading')" class="flex flex-col items-center justify-center w-12 py-1.5 rounded-2xl hover:bg-purple-600/30 text-slate-300 transition">
+        <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
+        <span class="text-[9px] font-medium mt-0.5">Leitura</span>
+      </button>
+      <button type="button" onclick="switchTab(isLawProfileActive() ? 'law' : 'englab')" class="flex flex-col items-center justify-center w-12 py-1.5 rounded-2xl hover:bg-purple-600/30 text-slate-300 transition">
+        <i data-lucide="calculator" class="w-4 h-4 text-amber-400"></i>
+        <span class="text-[9px] font-medium mt-0.5">Calculadoras</span>
+      </button>
+      <button type="button" onclick="switchTab('couple')" class="flex flex-col items-center justify-center w-12 py-1.5 rounded-2xl hover:bg-purple-600/30 text-slate-300 transition">
+        <i data-lucide="heart-handshake" class="w-4 h-4 text-pink-400"></i>
+        <span class="text-[9px] font-medium mt-0.5">Casal</span>
+      </button>
+      <button type="button" onclick="switchTab('profile')" class="flex flex-col items-center justify-center w-12 py-1.5 rounded-2xl hover:bg-purple-600/30 text-slate-300 transition">
+        <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i>
+        <span class="text-[9px] font-medium mt-0.5">Ajustes</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- =====================================================
        SPOTIFY-STYLE FLOATING MINI-PLAYER PILL (ESTUDO & LEITURA)
        Arraste para baixo (swipe down) para ocultar mantendo o cronômetro ativo!
        ===================================================== -->
@@ -3435,7 +3471,7 @@
       };
     }
 
-    let state = getDefaultState();
+    var state = getDefaultState();
     let activePdfId = null;
     let activePdfPageIndex = 0;
     let workoutChartInstance = null;
@@ -5366,8 +5402,7 @@
     // ==========================================
     const SUPABASE_URL = 'https://hekuzxekogampnylpzft.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_9jn67ZzEnMNF1X73r--Bxw_IsmeK4Zv';
-    let cloudSyncDebounce = null;
-    let initialCloudSyncCompleted = false;
+
 
     function setCloudStatus(text, ok = true) {
       const lbl = document.getElementById('cloud-sync-label');
@@ -5450,7 +5485,7 @@
       if (!rows || rows.length === 0) {
         // First time: push local active profile up to Supabase
         await pushManifestToSupabase();
-        await if (initialCloudSyncCompleted) pushProfileToSupabase(currentProfileId, state);
+        await pushProfileToSupabase(currentProfileId, state);
         if (showFeedback) showToast('Conectado ao Supabase! Dados iniciais enviados para a nuvem.', 'success');
         return;
       }
@@ -5528,11 +5563,7 @@
     // ENGINE MULTI-PERFIL (ROMA PROFILES)
     // ==========================================
     const MULTI_PROFILES_KEY = 'roma_profiles_manifest_v1';
-    let currentProfileId = 'profile_1';
-    let profilesManifest = [
-      { id: 'profile_1', name: 'Meu Perfil (Eng. Comp.)', course: 'Engenharia de Computação • 2º Período', role: 'eng', photo: '' },
-      { id: 'profile_2', name: 'Namorada (Direito UEMG)', course: 'Direito • 6º Período (UEMG Frutal)', role: 'law', photo: '' }
-    ];
+
 
     function loadProfilesManifest() {
       try {
@@ -6173,9 +6204,7 @@
     // ==========================================
     // TAB 6: LEITURA (REGISTRO, VELOCIDADE, LIVROS AVALIADOS & TABELA ESTATÍSTICA)
     // ==========================================
-    let readingTimerSec = 0;
-    let readingTimerRunning = false;
-    let readingTimerInterval = null;
+
 
 
     // ==========================================
@@ -6513,6 +6542,8 @@
           const s = String(readingTimerSec % 60).padStart(2, '0');
           const disp = document.getElementById('reading-stopwatch-display');
           if (disp) disp.textContent = `${m}:${s}`;
+          updateCompactReadingPlayerUI();
+          syncSpotifyMiniPlayer();
           const minsInp = document.getElementById('read-log-mins');
           if (minsInp) {
             minsInp.value = Math.max(1, Math.ceil(readingTimerSec / 60));
@@ -6523,12 +6554,16 @@
         clearInterval(readingTimerInterval);
         if (btn) btn.textContent = 'Continuar';
       }
+      updateCompactReadingPlayerUI();
+      syncSpotifyMiniPlayer();
     }
 
     function resetReadingStopwatch() {
       clearInterval(readingTimerInterval);
       readingTimerRunning = false;
       readingTimerSec = 0;
+      updateCompactReadingPlayerUI();
+      syncSpotifyMiniPlayer();
       const disp = document.getElementById('reading-stopwatch-display');
       const btn = document.getElementById('reading-stopwatch-btn');
       if (disp) disp.textContent = '00:00';
@@ -6549,8 +6584,7 @@
     // ==========================================
     // OPÇÃO 7: COMMAND BAR, MINI-PLAYER SPOTIFY COM SWIPE-DOWN & WIDGETS POR PERFIL
     // ==========================================
-    let miniPlayerDismissed = false;
-    let activeMiniPlayerMode = null; // 'study' | 'reading'
+
 
     function syncSpotifyMiniPlayer() {
       const pill = document.getElementById('spotify-mini-player');
@@ -6559,7 +6593,7 @@
       if (!pill) return;
 
       const isStudyActive = studyTimerRunning || studyTimerSec > 0;
-      const isReadingActive = readingStopwatchRunning || readingStopwatchSec > 0;
+      const isReadingActive = readingTimerRunning || readingTimerSec > 0;
 
       if (!isStudyActive && !isReadingActive) {
         pill.classList.add('hidden');
@@ -6571,7 +6605,7 @@
         return;
       }
 
-      if (readingStopwatchRunning) activeMiniPlayerMode = 'reading';
+      if (readingTimerRunning) activeMiniPlayerMode = 'reading';
       else if (studyTimerRunning) activeMiniPlayerMode = 'study';
       else if (isReadingActive) activeMiniPlayerMode = 'reading';
       else activeMiniPlayerMode = 'study';
@@ -6583,10 +6617,10 @@
       if (activeMiniPlayerMode === 'reading') {
         const bName = (state.currentBook && state.currentBook.title) || document.getElementById('read-log-book')?.value || 'Leitura Atual';
         titleText = `Leitura • ${bName}`;
-        const m = String(Math.floor(readingStopwatchSec / 60)).padStart(2, '0');
-        const sec = String(readingStopwatchSec % 60).padStart(2, '0');
+        const m = String(Math.floor(readingTimerSec / 60)).padStart(2, '0');
+        const sec = String(readingTimerSec % 60).padStart(2, '0');
         formattedTime = `${m}:${sec}`;
-        isRunningNow = readingStopwatchRunning;
+        isRunningNow = readingTimerRunning;
       } else {
         const sName = state.activeStudySubject || 'Estudo Geral';
         titleText = `Estudo • ${sName}`;
@@ -6734,7 +6768,7 @@
       if (barEl) barEl.style.width = `${pct}%`;
       if (pctEl) pctEl.textContent = `${pct}% concluído`;
       if (playBtn) {
-        playBtn.innerHTML = readingStopwatchRunning
+        playBtn.innerHTML = readingTimerRunning
           ? `<i data-lucide="pause" class="w-5 h-5"></i>`
           : `<i data-lucide="play" class="w-5 h-5 fill-current"></i>`;
       }
@@ -6745,7 +6779,7 @@
       toggleReadingStopwatch();
       updateCompactReadingPlayerUI();
       syncSpotifyMiniPlayer();
-      if (readingStopwatchRunning) {
+      if (readingTimerRunning) {
         showToast('Cronômetro de leitura iniciado no Mini-Player!', 'success');
       }
     }
@@ -6765,76 +6799,147 @@
       return currentProfileId === 'profile_2' || course.includes('direito') || course.includes('uemg') || name.includes('direito') || name.includes('namorada');
     }
 
+    function toggleOption7DockCollapse() {
+      const items = document.getElementById('option7-dock-items');
+      if (items) items.classList.toggle('hidden');
+    }
+
     function renderProfileAdaptiveCommandWidget() {
       const box = document.getElementById('profile-adaptive-command-widget');
       const mobShort = document.getElementById('mobile-active-profile-short');
+      const lawActive = isLawProfileActive();
       if (mobShort) {
-        mobShort.textContent = isLawProfileActive() ? 'Direito UEMG' : 'Eng. Comp.';
+        mobShort.textContent = lawActive ? 'Direito UEMG' : 'Eng. Comp.';
       }
       if (!box) return;
 
-      if (isLawProfileActive()) {
-        box.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-[10px] font-mono uppercase text-amber-300">Command Widget • Direito UEMG & TJMG</span>
-            <button type="button" onclick="switchTab('law')" class="text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1">
-              Abrir Hub Execução Penal <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-amber-500/30 space-y-1">
-              <span class="text-[10px] font-mono uppercase text-amber-300">Calculadora LEP / SEEU</span>
-              <p class="text-xs font-bold text-white">Remição & Progressão</p>
-              <p class="text-[11px] text-slate-400">Art. 112 (16% a 70%) e Art. 126 LEP</p>
-              <button type="button" onclick="switchTab('law')" class="mt-1 text-[11px] font-semibold text-purple-300 hover:underline">Calcular agora →</button>
+      const p1Id = (profilesManifest[0] && profilesManifest[0].id) || 'profile_1';
+      const p2Id = (profilesManifest[1] && profilesManifest[1].id) || 'profile_2';
+
+      const pillSwitcherHtml = `
+        <div class="grid grid-cols-2 gap-2.5 pb-2 border-b border-slate-800/80">
+          <button type="button" onclick="switchProfile('${p1Id}')" class="px-3.5 py-2.5 rounded-2xl border flex items-center justify-between transition ${!lawActive ? 'bg-purple-950/90 border-purple-400 text-white shadow-lg shadow-purple-900/30' : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-white'}">
+            <span class="flex items-center gap-2 text-xs font-bold truncate">
+              <i data-lucide="cpu" class="w-4 h-4 text-purple-400 shrink-0"></i>
+              <span class="truncate">Engineering Lab</span>
+            </span>
+            <span class="w-2.5 h-2.5 rounded-full ${!lawActive ? 'bg-emerald-400' : 'bg-slate-700'} shrink-0"></span>
+          </button>
+          <button type="button" onclick="switchProfile('${p2Id}')" class="px-3.5 py-2.5 rounded-2xl border flex items-center justify-between transition ${lawActive ? 'bg-purple-950/90 border-amber-400/80 text-white shadow-lg shadow-amber-900/20' : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-white'}">
+            <span class="flex items-center gap-2 text-xs font-bold truncate">
+              <i data-lucide="scale" class="w-4 h-4 text-amber-400 shrink-0"></i>
+              <span class="truncate">TJMG Criminal Law</span>
+            </span>
+            <span class="w-2.5 h-2.5 rounded-full ${lawActive ? 'bg-amber-400' : 'bg-slate-700'} shrink-0"></span>
+          </button>
+        </div>
+      `;
+
+      if (lawActive) {
+        box.innerHTML = pillSwitcherHtml + `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+            <!-- Card 1: Calculadora LEP & Progress Tracking (Estilo Opção 7) -->
+            <div class="p-4 rounded-2xl bg-slate-900/95 border border-purple-500/30 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">Execução Penal TJMG (LEP)</span>
+                <i data-lucide="calculator" class="w-4 h-4 text-purple-400"></i>
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-[11px] text-slate-300">
+                  <span>Progressão de Regime</span>
+                  <span class="font-mono font-bold text-emerald-400">80% cumprido</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
+                  <div class="h-full rounded-full bg-gradient-to-r from-cyan-400 to-purple-500" style="width: 80%"></div>
+                </div>
+              </div>
+              <div class="flex justify-between text-xs pt-1 border-t border-slate-800/80">
+                <span class="text-slate-400">Fração / % LEP:</span>
+                <span class="font-mono font-bold text-white">16% a 70% (Art. 112)</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Remição Acumulada:</span>
+                <span class="font-mono font-bold text-amber-300">30 dias (Art. 126)</span>
+              </div>
+              <button type="button" onclick="switchTab('law')" class="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white transition">
+                Abrir Calculadora SEEU / Custas →
+              </button>
             </div>
-            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-1">
-              <span class="text-[10px] font-mono uppercase text-purple-300">Pena de Multa & Custas</span>
-              <p class="text-xs font-bold text-white">Dias-Multa (Art. 49 CP)</p>
-              <p class="text-[11px] text-slate-400">Fração SM + Custas TJMG prontas p/ colar</p>
-              <button type="button" onclick="switchTab('law')" class="mt-1 text-[11px] font-semibold text-purple-300 hover:underline">Gerar certidão →</button>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-pink-500/30 space-y-1">
-              <span class="text-[10px] font-mono uppercase text-pink-300">Metas do Casal</span>
-              <p class="text-xs font-bold text-white">Ver Progresso Conjunto</p>
-              <p class="text-[11px] text-slate-400">Leitura, treinos e estudos sincronizados</p>
-              <button type="button" onclick="switchTab('couple')" class="mt-1 text-[11px] font-semibold text-pink-300 hover:underline">Comparar ao vivo →</button>
+
+            <!-- Card 2: Detração / Remição & Time Served Ring (Estilo Opção 7) -->
+            <div class="p-4 rounded-2xl bg-slate-900/95 border border-purple-500/30 flex flex-col justify-between space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">Detração, Multa & Tempo</span>
+                <span class="text-[10px] font-mono text-amber-300">6º Per. UEMG</span>
+              </div>
+              <div class="flex items-center gap-3.5">
+                <div class="w-16 h-16 rounded-full border-4 border-purple-500/80 border-t-cyan-400 flex flex-col items-center justify-center shrink-0">
+                  <span class="text-xs font-mono font-extrabold text-white">LEP</span>
+                  <span class="text-[9px] text-slate-400">SEEU</span>
+                </div>
+                <div class="flex-1 space-y-1 text-xs">
+                  <p class="text-slate-200 font-semibold">Dias-Multa & Remição</p>
+                  <p class="text-[11px] text-slate-400">Gere a memória de cálculo pronta para colar no processo.</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="switchTab('law')" class="py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-medium text-amber-300">Dias-Multa CP</button>
+                <button type="button" onclick="switchTab('study')" class="py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-medium text-purple-300">Iniciar Estudo</button>
+              </div>
             </div>
           </div>
         `;
       } else {
-        box.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-[10px] font-mono uppercase text-purple-300">Command Widget • Engenharia de Computação</span>
-            <button type="button" onclick="switchTab('study')" class="text-xs font-semibold text-purple-300 hover:text-white flex items-center gap-1">
-              Cronômetro de Estudos <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-1">
-              <span class="text-[10px] font-mono uppercase text-purple-300">Lab. Engenharia</span>
-              <p class="text-xs font-bold text-white">Bases, IEEE-754 & Verdade</p>
-              <p class="text-[11px] text-slate-400">Conversor Bin/Hex e portas lógicas</p>
-              <button type="button" onclick="switchTab('englab')" class="mt-1 text-[11px] font-semibold text-purple-300 hover:underline">Abrir Lab →</button>
+        const studyMins = (state.studySessions || []).reduce((a, b) => a + (Number(b.mins) || 0), 0);
+        const studyHrs = (studyMins / 60).toFixed(1);
+        box.innerHTML = pillSwitcherHtml + `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+            <!-- Card 1: Engineering Lab & Active Study Progress (Estilo Opção 7) -->
+            <div class="p-4 rounded-2xl bg-slate-900/95 border border-purple-500/30 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">Status de Estudo & Engenharia</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-[11px] text-slate-300">
+                  <span>Progresso Semanal</span>
+                  <span class="font-mono font-bold text-cyan-300">${studyHrs}h estudadas</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
+                  <div class="h-full rounded-full bg-gradient-to-r from-cyan-400 to-purple-500" style="width: 72%"></div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <button type="button" onclick="switchTab('study')" class="py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white">▶ Cronômetro</button>
+                <button type="button" onclick="switchTab('englab')" class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-purple-300">Lab Bin/IEEE</button>
+              </div>
             </div>
-            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 space-y-1">
-              <span class="text-[10px] font-mono uppercase text-emerald-300">IDE Código C & Python</span>
-              <p class="text-xs font-bold text-white">Trilha Guiada + Sandbox</p>
-              <p class="text-[11px] text-slate-400">Pratique ponteiros, structs e TADs</p>
-              <button type="button" onclick="switchTab('coding')" class="mt-1 text-[11px] font-semibold text-emerald-300 hover:underline">Codar agora →</button>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-pink-500/30 space-y-1">
-              <span class="text-[10px] font-mono uppercase text-pink-300">Metas do Casal</span>
-              <p class="text-xs font-bold text-white">Você & Sua Namorada</p>
-              <p class="text-[11px] text-slate-400">Sincronizado em tempo real no Supabase</p>
-              <button type="button" onclick="switchTab('couple')" class="mt-1 text-[11px] font-semibold text-pink-300 hover:underline">Ver placar →</button>
+
+            <!-- Card 2: Time Spent Visual Bars & Coding (Estilo Opção 7) -->
+            <div class="p-4 rounded-2xl bg-slate-900/95 border border-purple-500/30 flex flex-col justify-between space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">Telemetria & Código C/Python</span>
+                <span class="text-[10px] font-mono text-purple-300">2º Período</span>
+              </div>
+              <!-- Mini Visual Bar Chart like Option 7 -->
+              <div class="flex items-end justify-between gap-1.5 h-12 px-2 pt-2">
+                <div class="flex-1 bg-cyan-500/70 rounded-t-md h-6"></div>
+                <div class="flex-1 bg-indigo-500/80 rounded-t-md h-10"></div>
+                <div class="flex-1 bg-purple-500/90 rounded-t-md h-8"></div>
+                <div class="flex-1 bg-fuchsia-500 rounded-t-md h-12"></div>
+                <div class="flex-1 bg-purple-400/80 rounded-t-md h-9"></div>
+                <div class="flex-1 bg-emerald-400/80 rounded-t-md h-11"></div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="switchTab('coding')" class="py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-medium text-emerald-300">IDE C / Python</button>
+                <button type="button" onclick="switchTab('couple')" class="py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-medium text-pink-300">Metas do Casal</button>
+              </div>
             </div>
           </div>
         `;
       }
       if (window.lucide) lucide.createIcons();
     }
-
     function quickTogglePartnerProfile() {
       if (profilesManifest.length < 2) {
         openProfileSwitchModal();
@@ -7130,10 +7235,7 @@
     // ==========================================
     // SESSÕES DE ESTUDO (CRONÔMETRO POR MATÉRIA, BANCO AUTOMÁTICO & GRÁFICO)
     // ==========================================
-    let studyTimerSec = 0;
-    let studyTimerRunning = false;
-    let studyTimerInterval = null;
-    let studyChartInstance = null;
+
 
     function addStudySubjectToBank() {
       const inp = document.getElementById('new-study-subject-input');
@@ -7192,6 +7294,7 @@
         clearInterval(studyTimerInterval);
         if (btn) btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> <span>Continuar Estudo</span>`;
       }
+      syncSpotifyMiniPlayer();
       if (window.lucide) lucide.createIcons();
     }
 
@@ -8423,6 +8526,15 @@
       initMiniPlayerSwipeGesture();
       syncSpotifyMiniPlayer();
       syncAllFromSupabase(false);
+      
+      if ('caches' in window) {
+        caches.keys().then(keys => {
+          keys.forEach(k => {
+            if (k !== 'roma-pwa-v5') caches.delete(k).catch(() => {});
+          });
+        }).catch(() => {});
+      }
+
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistration().then(reg => {
           if (reg) reg.update().catch(() => {});
