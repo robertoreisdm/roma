@@ -1,4 +1,4 @@
-const CACHE_NAME = 'roma-pwa-v8';
+const CACHE_NAME = 'roma-pwa-v10';
 const ASSETS = ['./index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', (event) => {
@@ -25,6 +25,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
+  if (req.url.includes('supabase.co')) return;
   const isHtml = req.mode === 'navigate' || req.url.endsWith('.html') || req.url.endsWith('/');
   event.respondWith(
     fetch(req, isHtml ? { cache: 'no-store' } : undefined)

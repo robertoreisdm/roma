@@ -633,16 +633,16 @@
   <!-- MAIN WORKSPACE -->
   <main class="flex-1 md:pl-64 lg:pl-72 pb-24 md:pb-10 min-h-screen">
     <!-- Top Desktop Utility Bar -->
-    <div class="hidden md:flex items-center justify-between px-8 py-4 border-b border-slate-800/80 cold-glass sticky top-0 z-20">
+    <div class="hidden md:flex flex-wrap items-center justify-between gap-3 px-6 lg:px-8 py-3.5 border-b border-slate-800/80 cold-glass sticky top-0 z-20">
       <div>
         <h2 id="page-title" class="text-xl font-bold text-white tracking-tight">Visão Geral do Semestre</h2>
         <p id="page-subtitle" class="text-xs text-slate-400 mt-0.5">Acompanhamento integrado de disciplinas do 2º período, biblioteca acadêmica, treinos e rotina.</p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2">
         <!-- Quick Global Pill Search (Inspired by UI Reference) -->
         <div class="relative flex items-center">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Buscar PDF, nota, treino..." class="pl-10 pr-9 py-2 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-500 w-64 shadow-sm transition-all" />
+          <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Buscar PDF, nota, treino..." class="pl-10 pr-9 py-2 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-500 w-48 xl:w-60 shadow-sm transition-all" />
           <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
         </div>
         <!-- Profile Switcher Dropdown in Top Bar -->
@@ -920,7 +920,7 @@
       <!-- ==========================================
            TAB 1: VISÃO GERAL (DASHBOARD)
            ========================================== -->
-      <section id="tab-dashboard" class="space-y-6">
+      <section id="tab-dashboard" class="hidden space-y-6">
         <!-- Welcome Banner (Architectural Minimalist Card) -->
         <div class="p-7 rounded-3xl arch-hero shadow-xl relative overflow-hidden">
           <div class="arch-grid-overlay absolute inset-0 pointer-events-none"></div>
@@ -2303,7 +2303,7 @@
   <!-- =====================================================
        OPÇÃO 7: DOCK VERTICAL TRANSLÚCIDO FLUTUANTE NA DIREITA (COMO NA IMAGEM 7)
        ===================================================== -->
-  <aside id="option7-floating-dock" class="fixed right-2.5 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center py-3 px-1.5 rounded-3xl bg-[#16102c]/80 backdrop-blur-2xl border border-purple-500/40 shadow-2xl gap-2.5 transition-all duration-300">
+  <aside id="option7-floating-dock" class="md:hidden fixed right-2.5 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center py-3 px-1.5 rounded-3xl bg-[#16102c]/80 backdrop-blur-2xl border border-purple-500/40 shadow-2xl gap-2.5 transition-all duration-300">
     <button type="button" onclick="toggleOption7DockCollapse()" class="w-8 h-6 rounded-xl flex items-center justify-center text-purple-300 hover:text-white" title="Recolher / Expandir Dock Lateral">
       <i data-lucide="equal" class="w-4 h-4"></i>
     </button>
@@ -5766,10 +5766,32 @@
         }
 
         let localState = null;
+        const localCandidates = [];
+        if (profId === currentProfileId && state && typeof state === 'object') {
+          localCandidates.push(state);
+        }
         try {
           const rawLocal = localStorage.getItem(getStorageKeyForProfile(profId));
-          if (rawLocal) localState = JSON.parse(rawLocal);
+          if (rawLocal) localCandidates.push(JSON.parse(rawLocal));
         } catch (e) {}
+        if (profId === 'profile_1') {
+          try {
+            const rawLegacy = localStorage.getItem(STORAGE_KEY);
+            if (rawLegacy) {
+              const pLeg = JSON.parse(rawLegacy);
+              if (pLeg && (!pLeg._profileId || pLeg._profileId === 'profile_1')) localCandidates.push(pLeg);
+            }
+          } catch (e) {}
+        }
+        try {
+          const idbLocal = await loadFromIndexedDB(profId);
+          if (idbLocal) localCandidates.push(idbLocal);
+        } catch (e) {}
+        for (const cand of localCandidates) {
+          if (cand && typeof cand === 'object') {
+            localState = localState ? mergeProfileStates(localState, cand) : cand;
+          }
+        }
 
         if (cloudState && localState) {
           const cloudTs = Number(cloudState._updatedAt) || 0;
@@ -5779,7 +5801,10 @@
           const merged = mergeProfileStates(newer, older);
           merged._profileId = profId;
           try {
-            localStorage.setItem(getStorageKeyForProfile(profId), JSON.stringify(merged));
+            const serMerged = JSON.stringify(merged);
+            localStorage.setItem(getStorageKeyForProfile(profId), serMerged);
+            if (profId === 'profile_1') localStorage.setItem(STORAGE_KEY, serMerged);
+            saveToIndexedDB(merged, profId);
           } catch (e) {}
           if (profId === currentProfileId) {
             applyLoadedState(merged);
@@ -8827,7 +8852,7 @@
       if ('caches' in window) {
         caches.keys().then(keys => {
           keys.forEach(k => {
-            if (k !== 'roma-pwa-v8') caches.delete(k).catch(() => {});
+            if (k !== 'roma-pwa-v10') caches.delete(k).catch(() => {});
           });
         }).catch(() => {});
       }
@@ -8864,7 +8889,7 @@
       if (document.visibilityState === 'visible' && navigator.onLine !== false) {
         syncAllFromSupabase(false);
       }
-    }, 25000);
+    }, 12000);
     window.addEventListener('pagehide', () => {
       saveState();
     });
