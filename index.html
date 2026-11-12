@@ -184,7 +184,7 @@
     html:not(.dark) #exercise-modal > div,
     html:not(.dark) #cardio-modal > div,
     html:not(.dark) #schedule-modal > div,
-    html:not(.dark) #sync-modal > div, html:not(.dark) #install-modal > div, html:not(.dark) #split-manager-modal > div, html:not(.dark) #bank-modal > div, html:not(.dark) #bulk-week-modal > div, html:not(.dark) #read-book-modal > div, html:not(.dark) #logic-modal > div, html:not(.dark) #finish-reading-modal > div, html:not(.dark) #day-goals-modal > div {
+    html:not(.dark) #sync-modal > div, html:not(.dark) #install-modal > div, html:not(.dark) #split-manager-modal > div, html:not(.dark) #bank-modal > div, html:not(.dark) #bulk-week-modal > div, html:not(.dark) #read-book-modal > div, html:not(.dark) #logic-modal > div, html:not(.dark) #finish-reading-modal > div, html:not(.dark) #day-goals-modal > div, html:not(.dark) #create-profile-modal > div, html:not(.dark) #profile-switch-modal > div, html:not(.dark) #sunday-recap-modal > div, html:not(.dark) #google-hub-modal > div {
       background-color: #ffffff !important;
       border-color: #e2e5ec !important;
       color: #181a1f !important;
@@ -388,6 +388,9 @@
       <button type="button" onclick=" togglePomodoroMini()" class="hidden" aria-hidden="true">
         <span id="mobile-pomo-display">25:00</span>
       </button>
+      <button type="button" onclick="openProfileSwitchModal()" class="focus-ring p-2 rounded-full bg-purple-950/90 border border-purple-600/50 text-purple-300" title="Trocar Perfil" aria-label="Trocar Perfil">
+        <i data-lucide="users" class="w-4 h-4"></i>
+      </button>
       <button type="button" onclick="toggleDarkMode()" class="focus-ring p-2 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300" aria-label="Alternar Modo Escuro">
         <i data-lucide="moon" class="w-4 h-4" id="mobile-theme-icon"></i>
       </button>
@@ -452,6 +455,30 @@
           <span>Leitura</span>
         </div>
         <span id="badge-reading" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-emerald-300">Novo</span>
+      </button>
+
+      <button type="button" onclick="switchTab('study')" id="nav-study" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all focus-ring">
+        <div class="flex items-center gap-3">
+          <i data-lucide="clock" class="w-4 h-4 shrink-0"></i>
+          <span>Estudos & Tempo</span>
+        </div>
+        <span id="badge-study" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-purple-300">0h</span>
+      </button>
+
+      <button type="button" onclick="switchTab('couple')" id="nav-couple" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all focus-ring">
+        <div class="flex items-center gap-3">
+          <i data-lucide="heart-handshake" class="w-4 h-4 shrink-0 text-pink-400"></i>
+          <span>Metas do Casal</span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-pink-950/80 text-pink-300 border border-pink-700/40">2 Perfis</span>
+      </button>
+
+      <button type="button" onclick="switchTab('law')" id="nav-law" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all focus-ring">
+        <div class="flex items-center gap-3">
+          <i data-lucide="scale" class="w-4 h-4 shrink-0 text-amber-400"></i>
+          <span>Direito • UEMG</span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-amber-300">6º Per.</span>
       </button>
 
       <div class="pt-4 mt-4 border-t border-slate-800/80 space-y-1.5">
@@ -528,6 +555,13 @@
           <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Buscar PDF, nota, treino..." class="pl-10 pr-9 py-2 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-500 w-64 shadow-sm transition-all" />
           <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
         </div>
+        <!-- Profile Switcher Dropdown in Top Bar -->
+        <div class="relative flex items-center">
+          <select id="topbar-profile-select" onchange="switchProfile(this.value)" class="pl-8 pr-4 py-2 rounded-full bg-slate-900 border border-purple-500/40 text-xs font-semibold text-purple-200 focus:outline-none focus:border-purple-400 cursor-pointer shadow-sm">
+            <option value="default">👤 Perfil 1 (Estudante)</option>
+          </select>
+          <i data-lucide="users" class="w-3.5 h-3.5 text-purple-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        </div>
         <!-- Dark Mode Toggle Button -->
         <button type="button" onclick="toggleDarkMode()" id="theme-toggle-btn" class="px-3.5 py-2 rounded-full bg-slate-900 border border-slate-700/80 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition focus-ring" title="Alternar entre Modo Claro e Modo Escuro">
           <i data-lucide="moon" class="w-3.5 h-3.5"></i>
@@ -537,6 +571,14 @@
         <button type="button" onclick="toggleHighContrastFont()" class="px-3.5 py-2 rounded-full bg-slate-900 border border-slate-700/80 text-xs text-slate-300 flex items-center gap-1.5 transition focus-ring" title="Acessibilidade: Alternar tamanho de leitura">
           <i data-lucide="type" class="w-3.5 h-3.5 text-cyan-400"></i>
           <span id="font-scale-label">Texto: Normal</span>
+        </button>
+        <button type="button" onclick="openGoogleHubModal()" class="px-3.5 py-2 rounded-full bg-slate-900 border border-purple-500/40 hover:border-purple-400 text-xs font-semibold text-purple-200 flex items-center gap-1.5 transition focus-ring" title="Integração Google Calendar, Drive e Gemini">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400"></i>
+          <span>Google & Gemini</span>
+        </button>
+        <button type="button" onclick="openSundayRecapModal()" class="px-3.5 py-2 rounded-full bg-slate-900 border border-amber-500/40 hover:border-amber-400 text-xs font-semibold text-amber-300 flex items-center gap-1.5 transition focus-ring" title="Ver Card Visual de Resumo da Semana (Domingo)">
+          <i data-lucide="award" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Resumo Semanal</span>
         </button>
         <button type="button" onclick="openInstallModal()" class="px-3.5 py-2 rounded-full bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-1.5 transition focus-ring">
           <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
@@ -581,10 +623,10 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <span class="px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-              Sincronização Permanente Ativa
-            </span>
+            <button type="button" onclick="syncAllFromSupabase(true)" id="cloud-sync-pill" class="px-3.5 py-1.5 rounded-full bg-slate-900 border border-purple-500/40 hover:border-purple-400 text-xs font-mono text-emerald-300 flex items-center gap-2 transition" title="Clique para sincronizar agora com a nuvem Supabase">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="cloud-sync-dot"></span>
+              <span id="cloud-sync-label">Nuvem Supabase Conectada</span>
+            </button>
             <button type="button" onclick="switchTab('dashboard')" class="px-3.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-xs font-medium text-white transition">
               Abrir Visão Geral Completa →
             </button>
@@ -1142,6 +1184,9 @@
             <button type="button" onclick="applySchedulePreset('exams')" class="px-3 py-2 rounded-xl bg-indigo-950/90 hover:bg-indigo-900/80 border border-indigo-700/70 text-xs text-indigo-200 transition focus-ring" title="Aumentar blocos de revisão para Semana de Provas">
               Modo Semana de Provas
             </button>
+            <button type="button" onclick="exportScheduleToICS()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-purple-300 flex items-center gap-1.5 transition focus-ring" title="Exportar cronograma para Google Calendar / Apple Calendar (.ics)">
+              <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i> Exportar p/ Google Agenda
+            </button>
             <button type="button" onclick="openScheduleModal()" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-1.5 shadow-lg shadow-cyan-600/20 transition focus-ring">
               <i data-lucide="plus" class="w-4 h-4"></i> + Adicionar Horário
             </button>
@@ -1157,109 +1202,142 @@
       </section>
 
       <!-- ==========================================
-           TAB 6: LEITURA (REGISTRO DIÁRIO, VELOCIDADE, AVALIAÇÃO DE LIVROS & ESTATÍSTICAS)
+           TAB 6: LEITURA (ESTÚDIO EDITORIAL: DIÁRIO, % DO LIVRO ATUAL, REVIEWS, WISHLIST & CITAÇÕES)
            ========================================== -->
       <section id="tab-reading" class="hidden space-y-6">
-        <div class="cold-card p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="book-open" class="w-5 h-5 text-teal-400"></i>
-              Diário de Leitura, Velocidade & Avaliações
-            </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Registre quantas páginas leu por dia, acompanhe sua velocidade de leitura (pág/h) e avalie os livros que já leu.</p>
+        <!-- Editorial Header with Sub-Navigation Pills -->
+        <div class="cold-card p-6 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center text-white shadow-lg shrink-0">
+              <i data-lucide="book-open" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white tracking-tight">Estúdio de Leitura</h3>
+              <p class="text-xs text-slate-400">Cronômetro automático, progresso percentual do livro atual, estante avaliada, wishlist e citações favoritas.</p>
+            </div>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="openReadBookModal()" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-1.5">
-              <i data-lucide="star" class="w-4 h-4"></i> + Adicionar Livro Lido & Avaliar
+
+          <!-- Intuitive Sub-Navigation Pills -->
+          <div class="flex flex-wrap items-center gap-1.5 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
+            <button type="button" id="rsub-diary" onclick="setReadingSubtab('diary')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition">
+              Cronômetro & Diário
+            </button>
+            <button type="button" id="rsub-reviewed" onclick="setReadingSubtab('reviewed')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+              Livros Lidos & Reviews
+            </button>
+            <button type="button" id="rsub-wishlist" onclick="setReadingSubtab('wishlist')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+              Wishlist (Quero Ler)
+            </button>
+            <button type="button" id="rsub-quotes" onclick="setReadingSubtab('quotes')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+              Citações Favoritas
             </button>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Left 2 Columns: Registrar Leitura Diária + Livros Lidos e Avaliados -->
+        <!-- SUBVIEW 1: CRONÔMETRO, LIVRO ATUAL (%) & ESTATÍSTICAS -->
+        <div id="reading-subview-diary" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-2 space-y-6">
-            <!-- Daily Reading Log & Speed Calculator -->
-            <div class="cold-card p-5 rounded-2xl space-y-4">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h4 class="text-sm font-bold text-white flex items-center gap-2">
-                  <i data-lucide="gauge" class="w-4 h-4 text-cyan-400"></i>
-                  Registrar Leitura do Dia & Calcular Velocidade
-                </h4>
-                <!-- Live Reading Speed Stopwatch with Finish & Auto-Register -->
-                <div class="flex flex-wrap items-center gap-2 bg-slate-900 px-3.5 py-2 rounded-2xl border border-slate-800">
-                  <div class="flex items-center gap-1.5">
-                    <i data-lucide="timer" class="w-4 h-4 text-cyan-400"></i>
-                    <span class="text-xs font-mono text-slate-300">Cronômetro:</span>
-                    <span id="reading-stopwatch-display" class="text-sm font-mono font-bold text-emerald-400 px-1.5">00:00</span>
-                  </div>
-                  <button type="button" onclick="toggleReadingStopwatch()" id="reading-stopwatch-btn" class="px-3 py-1 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white">
-                    Iniciar Leitura
-                  </button>
-                  <button type="button" onclick="finishReadingStopwatchSession()" id="reading-stopwatch-finish-btn" class="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">
-                    Finalizar & Registrar Páginas
-                  </button>
-                  <button type="button" onclick="resetReadingStopwatch()" class="px-2 py-1 text-xs text-slate-400 hover:text-white">Zerar</button>
+            <!-- Hero Reading Stopwatch Card -->
+            <div class="cold-card p-6 rounded-3xl space-y-5 border border-purple-500/30">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 text-[10px] font-mono uppercase tracking-wider">Sessão de Leitura Guiada</span>
+                  <h4 class="text-base font-bold text-white mt-1.5">Cronômetro Inteligente de Leitura</h4>
+                  <p class="text-xs text-slate-400">Inicie ao abrir o livro e clique em Finalizar ao terminar: o Roma pergunta as páginas e registra tudo sozinho.</p>
+                </div>
+                <div class="px-5 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-center shrink-0">
+                  <span class="text-[10px] font-mono uppercase text-slate-400 block">Tempo Decorrido</span>
+                  <span id="reading-stopwatch-display" class="text-2xl font-mono font-extrabold text-emerald-400 tracking-wider">00:00</span>
                 </div>
               </div>
 
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button type="button" onclick="toggleReadingStopwatch()" id="reading-stopwatch-btn" class="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-2">
+                  <i data-lucide="play" class="w-4 h-4"></i> <span>Iniciar Leitura</span>
+                </button>
+                <button type="button" onclick="finishReadingStopwatchSession()" id="reading-stopwatch-finish-btn" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white flex items-center gap-2">
+                  <i data-lucide="check-circle-2" class="w-4 h-4"></i> <span>Finalizar & Registrar Páginas</span>
+                </button>
+                <button type="button" onclick="resetReadingStopwatch()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 text-xs text-slate-300 hover:text-white">
+                  Zerar
+                </button>
+              </div>
+
+              <!-- Current Book Progress (%) Tracker (feeds the Sunday Recap Card too!) -->
+              <div class="pt-4 border-t border-slate-800/80 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <i data-lucide="bookmark" class="w-4 h-4 text-purple-400"></i> Livro que Estou Lendo Agora (Progresso %)
+                  </span>
+                  <span id="current-book-pct-badge" class="text-xs font-mono font-bold text-purple-300">0% concluído</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Título do Livro Atual</label>
+                    <input type="text" id="current-reading-title" placeholder="Ex: Código Limpo / Vade Mecum" oninput="saveCurrentBookProgress()" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Página Atual</label>
+                    <input type="number" id="current-reading-page" value="0" min="0" oninput="saveCurrentBookProgress()" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-slate-400 block mb-1">Total de Páginas do Livro</label>
+                    <input type="number" id="current-reading-total" value="300" min="1" oninput="saveCurrentBookProgress()" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+                  </div>
+                </div>
+                <div class="w-full h-2.5 rounded-full bg-slate-900 overflow-hidden p-0.5 border border-slate-800">
+                  <div id="current-book-progress-bar" class="h-full rounded-full bg-gradient-to-r from-purple-500 to-emerald-400 transition-all" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Manual Daily Reading Log Card -->
+            <div class="cold-card p-6 rounded-3xl space-y-4">
+              <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                <i data-lucide="pen-line" class="w-4 h-4 text-cyan-400"></i>
+                Lançamento Manual de Leitura Diária
+              </h4>
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div class="sm:col-span-2">
-                  <label class="text-xs text-slate-300 block mb-1">Livro que está lendo</label>
-                  <input type="text" id="read-log-book" placeholder="Ex: Hábitos Atômicos / Código Limpo" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+                  <label class="text-xs text-slate-300 block mb-1">Livro lido</label>
+                  <input type="text" id="read-log-book" placeholder="Digite o nome do livro..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
                 </div>
                 <div>
-                  <label class="text-xs text-slate-300 block mb-1">Data da Leitura</label>
+                  <label class="text-xs text-slate-300 block mb-1">Data</label>
                   <input type="date" id="read-log-date" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
                 </div>
                 <div>
-                  <label class="text-xs text-slate-300 block mb-1">Páginas Lidas no Dia</label>
+                  <label class="text-xs text-slate-300 block mb-1">Páginas Lidas</label>
                   <input type="number" id="read-log-pages" value="15" min="1" oninput="previewReadingSpeed()" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
                 </div>
               </div>
-
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                 <div>
-                  <label class="text-xs text-slate-300 block mb-1">Tempo de Leitura (minutos)</label>
+                  <label class="text-xs text-slate-300 block mb-1">Tempo (minutos)</label>
                   <input type="number" id="read-log-mins" value="30" min="1" oninput="previewReadingSpeed()" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
                 </div>
                 <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
-                  <span class="text-[10px] font-mono text-slate-400 block">Velocidade Calculada</span>
-                  <span id="read-speed-preview" class="text-sm font-mono font-bold text-teal-400">30.0 pág/h (0.50 pág/min)</span>
+                  <span class="text-[10px] font-mono text-slate-400 block">Velocidade</span>
+                  <span id="read-speed-preview" class="text-xs font-mono font-bold text-teal-400">30.0 pág/h (0.50 pág/min)</span>
                 </div>
                 <button type="button" onclick="addDailyReadingLog()" class="w-full py-2.5 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white">
                   + Salvar Leitura do Dia
                 </button>
               </div>
             </div>
-
-            <!-- Livros Já Lidos & Avaliações -->
-            <div class="cold-card p-5 rounded-2xl space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h4 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
-                    Meus Livros Lidos & Avaliações
-                  </h4>
-                  <p class="text-[11px] text-slate-400">Avalie os livros que você já concluiu com estrelas (1 a 5 ★), nota e suas impressões.</p>
-                </div>
-                <button type="button" onclick="openReadBookModal()" class="text-xs text-cyan-400 hover:underline font-medium">+ Avaliar livro</button>
-              </div>
-              <div id="read-books-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
           </div>
 
           <!-- Right 1 Column: Tabela Estatística de Leitura (Dia, Semana e Mês) -->
           <div class="space-y-5">
-            <div class="cold-card p-5 rounded-2xl space-y-4">
+            <div class="cold-card p-5 rounded-3xl space-y-4">
               <div class="flex items-center justify-between">
                 <h4 class="text-sm font-bold text-white flex items-center gap-2">
                   <i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-400"></i>
-                  Tabela Estatística de Leitura
+                  Estatísticas (Dia, Semana e Mês)
                 </h4>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-teal-400">Tempo Real</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-teal-400">Ao Vivo</span>
               </div>
 
-              <!-- Summary Table: Dia, Semana e Mês -->
               <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                   <thead>
@@ -1270,15 +1348,13 @@
                       <th class="py-2 text-right">Velocidade</th>
                     </tr>
                   </thead>
-                  <tbody id="reading-stats-summary-tbody" class="divide-y divide-slate-800/70 font-mono">
-                  </tbody>
+                  <tbody id="reading-stats-summary-tbody" class="divide-y divide-slate-800/70 font-mono"></tbody>
                 </table>
               </div>
 
-              <!-- Detailed Daily Reading Log Table -->
               <div class="pt-3 border-t border-slate-800 space-y-2">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-white">Histórico de Leituras por Dia</span>
+                  <span class="text-xs font-semibold text-white">Histórico Diário</span>
                   <span id="reading-total-sessions-badge" class="text-[10px] font-mono text-slate-400">0 registros</span>
                 </div>
                 <div class="max-h-72 overflow-y-auto pr-1">
@@ -1298,6 +1374,339 @@
             </div>
           </div>
         </div>
+
+        <!-- SUBVIEW 2: LIVROS JÁ LIDOS & REVIEWS (COM CAPA) -->
+        <div id="reading-subview-reviewed" class="hidden space-y-4">
+          <div class="cold-card p-5 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
+                Galeria de Livros Lidos & Reviews
+              </h4>
+              <p class="text-xs text-slate-400">Sua biblioteca concluída com foto da capa, nota de 0 a 10, classificação em estrelas e review.</p>
+            </div>
+            <button type="button" onclick="openReadBookModal()" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-1.5">
+              <i data-lucide="plus" class="w-4 h-4"></i> + Adicionar Livro Lido & Avaliar
+            </button>
+            <button type="button" onclick="openReadBookModal()" class="hidden" aria-hidden="true">+ Avaliar livro</button>
+          </div>
+          <div id="read-books-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- SUBVIEW 3: WISHLIST (LISTA DE DESEJOS — QUERO LER) -->
+        <div id="reading-subview-wishlist" class="hidden space-y-4">
+          <div class="cold-card p-5 rounded-3xl space-y-4">
+            <div>
+              <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
+                Wishlist — Próximos Livros que Quero Ler
+              </h4>
+              <p class="text-xs text-slate-400">Guarde os livros na sua fila de leitura e transforme qualquer um no seu livro atual com 1 clique.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
+              <div>
+                <label class="text-[11px] text-slate-300 block mb-1">Título do Livro</label>
+                <input type="text" id="wish-book-title" placeholder="Ex: O Programador Pragmático / Direito Civil" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white" />
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-300 block mb-1">Autor</label>
+                <input type="text" id="wish-book-author" placeholder="Autor do livro" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white" />
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-300 block mb-1">Prioridade</label>
+                <select id="wish-book-priority" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white">
+                  <option value="Alta">🔥 Prioridade Alta</option>
+                  <option value="Média">⭐ Prioridade Média</option>
+                  <option value="Baixa">📌 Para o Futuro</option>
+                </select>
+              </div>
+              <button type="button" onclick="addWishlistBook()" class="py-2 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white">
+                + Adicionar à Wishlist
+              </button>
+            </div>
+            <div id="reading-wishlist-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+          </div>
+        </div>
+
+        <!-- SUBVIEW 4: CITAÇÕES FAVORITAS -->
+        <div id="reading-subview-quotes" class="hidden space-y-4">
+          <div class="cold-card p-5 rounded-3xl space-y-4">
+            <div>
+              <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                <i data-lucide="quote" class="w-4 h-4 text-teal-400"></i>
+                Mural de Citações & Trechos Favoritos
+              </h4>
+              <p class="text-xs text-slate-400">Salve frases marcantes, artigos ou passagens importantes dos seus livros.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <textarea id="quote-text-input" rows="2" placeholder="Digite a citação ou trecho favorito do livro..." class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white italic"></textarea>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                <input type="text" id="quote-book-input" placeholder="Livro / Obra" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white" />
+                <input type="text" id="quote-page-input" placeholder="Página / Capítulo (ex: Pág. 42)" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                <button type="button" onclick="addFavoriteQuote()" class="py-2 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white">
+                  + Salvar Citação
+                </button>
+              </div>
+            </div>
+            <div id="reading-quotes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 9: SESSÕES DE ESTUDO (CRONÔMETRO POR MATÉRIA, BANCO DE MATÉRIAS & GRÁFICO SEMANAL/MENSAL)
+           ========================================== -->
+      <section id="tab-study" class="hidden space-y-6">
+        <div class="cold-card p-5 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="clock" class="w-5 h-5 text-purple-400"></i>
+              Rastreador de Estudos por Matéria & Gráfico de Evolução
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Cadastre suas matérias uma única vez, inicie o cronômetro para medir seu tempo de estudo e acompanhe o gráfico semanal ou mensal.</p>
+          </div>
+          <button type="button" onclick="openSundayRecapModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+            <i data-lucide="calendar-heart" class="w-4 h-4"></i> Ver Resumo de Domingo
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left 2 Cols: Cronômetro de Estudo + Matérias Registradas Automaticamente -->
+          <div class="lg:col-span-2 space-y-5">
+            <!-- Study Timer Card -->
+            <div class="cold-card p-6 rounded-3xl space-y-4 border border-purple-500/30">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                  <span class="text-[10px] font-mono uppercase text-purple-300">Cronômetro Ativo de Estudo</span>
+                  <h4 class="text-base font-bold text-white" id="study-active-subject-label">Selecione ou adicione uma matéria abaixo</h4>
+                  <p class="text-xs text-slate-400">Ao finalizar, o tempo estudado é salvo automaticamente na matéria selecionada.</p>
+                </div>
+                <div class="px-6 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-center shrink-0">
+                  <span id="study-timer-display" class="text-2xl font-mono font-extrabold text-purple-300 tracking-wider">00:00:00</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button type="button" id="study-timer-start-btn" onclick="toggleStudySessionTimer()" class="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-2">
+                  <i data-lucide="play" class="w-4 h-4"></i> <span>Iniciar Estudo</span>
+                </button>
+                <button type="button" onclick="finishAndLogStudyTimer()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white flex items-center gap-2">
+                  <i data-lucide="check-circle" class="w-4 h-4"></i> <span>Finalizar & Salvar Tempo</span>
+                </button>
+                <button type="button" onclick="resetStudySessionTimer()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 text-xs text-slate-300 hover:text-white">
+                  Zerar
+                </button>
+              </div>
+            </div>
+
+            <!-- Banco de Matérias Registradas Automaticamente -->
+            <div class="cold-card p-5 rounded-3xl space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h4 class="text-sm font-bold text-white">Minhas Matérias Registradas ( Seleção Rápida )</h4>
+                  <p class="text-[11px] text-slate-400">As matérias que você adiciona ficam salvas automaticamente para reutilizar em qualquer sessão.</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input type="text" id="new-study-subject-input" placeholder="Adicionar matéria (ex: Cálculo II, Direito Constitucional, Penal...)" class="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+                <button type="button" onclick="addStudySubjectToBank()" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white shrink-0">
+                  + Salvar Matéria
+                </button>
+              </div>
+
+              <div id="study-subjects-bank-pills" class="flex flex-wrap gap-2"></div>
+
+              <!-- Manual Study Time Entry -->
+              <div class="pt-3 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-4 gap-2.5 items-end">
+                <div class="sm:col-span-2">
+                  <label class="text-[11px] text-slate-400 block mb-1">Matéria Estudada</label>
+                  <select id="manual-study-subject-select" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"></select>
+                </div>
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">Minutos Estudados</label>
+                  <input type="number" id="manual-study-mins" value="45" min="1" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+                <button type="button" onclick="logManualStudySession()" class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white">
+                  + Lançar Tempo
+                </button>
+              </div>
+            </div>
+
+            <!-- Study Sessions History -->
+            <div class="cold-card p-5 rounded-3xl space-y-3">
+              <h4 class="text-sm font-bold text-white">Histórico de Sessões de Estudo</h4>
+              <div id="study-sessions-history-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+          </div>
+
+          <!-- Right 1 Col: Gráfico Semanal / Mensal de Matérias Estudadas -->
+          <div class="space-y-5">
+            <div class="cold-card p-5 rounded-3xl space-y-4">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                  <i data-lucide="pie-chart" class="w-4 h-4 text-purple-400"></i>
+                  Tempo por Matéria
+                </h4>
+                <div class="inline-flex p-0.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <button type="button" id="study-chart-week-btn" onclick="setStudyChartRange('week')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-cyan-600 text-white">Semana</button>
+                  <button type="button" id="study-chart-month-btn" onclick="setStudyChartRange('month')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-400">Mês</button>
+                </div>
+              </div>
+              <div class="relative h-64 w-full">
+                <canvas id="studySubjectsChart"></canvas>
+              </div>
+              <div id="study-chart-summary-legend" class="space-y-1.5 pt-2 border-t border-slate-800 text-xs"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 10: METAS COMPARTILHADAS DO CASAL (VOCÊ VS. NAMORADA)
+           ========================================== -->
+      <section id="tab-couple" class="hidden space-y-6">
+        <div class="cold-card p-6 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-pink-500/30">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full bg-pink-950 text-pink-300 text-[10px] font-mono uppercase tracking-wider">Engenharia de Computação + Direito (UEMG Frutal)</span>
+            <h3 class="text-lg font-bold text-white mt-1 flex items-center gap-2">
+              <i data-lucide="heart-handshake" class="w-5 h-5 text-pink-400"></i>
+              Painel Compartilhado do Casal — Você & Sua Namorada
+            </h3>
+            <p class="text-xs text-slate-400">Compare em tempo real o progresso de leitura, treinos e horas de estudo dos dois perfis, sem misturar os dados individuais.</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="openSundayRecapModal()" class="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-semibold text-amber-300">
+              🏆 Card Resumo de Domingo
+            </button>
+          </div>
+        </div>
+
+        <!-- Comparativo Lado a Lado: Leitura, Treinos & Estudos -->
+        <div id="couple-comparison-cards" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
+
+        <!-- Barra de Progresso Conjunta & Metas Compartilhadas -->
+        <div class="cold-card p-6 rounded-3xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="text-sm font-bold text-white">Desafios & Metas Conjuntas do Casal</h4>
+              <p class="text-xs text-slate-400">A barra de progresso soma automaticamente a sua contribuição + a contribuição do perfil dela.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 items-end">
+            <div class="sm:col-span-2">
+              <label class="text-[11px] text-slate-300 block mb-1">Nome da Meta Conjunta</label>
+              <input type="text" id="couple-goal-title" placeholder="Ex: Ler 40 páginas somadas hoje / 10 treinos na semana" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white" />
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-300 block mb-1">Métrica & Alvo Total</label>
+              <div class="flex gap-1.5">
+                <select id="couple-goal-metric" class="px-2 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white">
+                  <option value="reading_day">Páginas (Hoje)</option>
+                  <option value="reading_week">Páginas (Semana)</option>
+                  <option value="workouts_week">Exercícios (Semana)</option>
+                  <option value="study_week">Minutos Estudo (Sem.)</option>
+                </select>
+                <input type="number" id="couple-goal-target" value="40" min="1" class="w-20 px-2 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+              </div>
+            </div>
+            <button type="button" onclick="addSharedCoupleGoal()" class="py-2 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white">
+              + Criar Meta do Casal
+            </button>
+          </div>
+
+          <div id="couple-shared-goals-list" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 11: DIREITO • UEMG FRUTAL (6º PERÍODO — PERFIL DA NAMORADA)
+           ========================================== -->
+      <section id="tab-law" class="hidden space-y-6">
+        <div class="cold-card p-6 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-amber-500/30">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0">
+              <i data-lucide="scale" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 text-[10px] font-mono uppercase tracking-wider">UEMG Frutal • 6º Período de Direito</span>
+              <h3 class="text-lg font-bold text-white mt-1">Hub Jurídico — Prazos, Vade Mecum, NPJ & Peças</h3>
+              <p class="text-xs text-slate-400">Ferramentas jurídicas pensadas para o 6º período de Direito: calculadora de prazos em dias úteis (CPC), caderno de artigos/súmulas e controle de peças práticas/OAB.</p>
+            </div>
+          </div>
+          <button type="button" onclick="openGoogleHubModal('law')" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> Consultar Jurisprudência no Gemini
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Tool 1: Calculadora de Prazos Processuais (CPC - Dias Úteis) -->
+          <div class="cold-card p-5 rounded-3xl space-y-4">
+            <h4 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="calendar-check" class="w-4 h-4 text-amber-400"></i>
+              Calculadora de Prazos Processuais (CPC)
+            </h4>
+            <p class="text-xs text-slate-400">Simule o vencimento de prazos em dias úteis (Art. 219 do CPC — excluindo o dia do começo e incluindo o do vencimento).</p>
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs text-slate-300 block mb-1">Data da Publicação / Intimação</label>
+                <input type="date" id="law-deadline-start" value="2026-11-12" onchange="calculateLegalDeadline()" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-xs text-slate-300 block mb-1">Prazo (Dias)</label>
+                  <input type="number" id="law-deadline-days" value="15" min="1" oninput="calculateLegalDeadline()" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="text-xs text-slate-300 block mb-1">Contagem</label>
+                  <select id="law-deadline-type" onchange="calculateLegalDeadline()" class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+                    <option value="business">Dias Úteis (CPC)</option>
+                    <option value="continuous">Dias Corridos (CPP)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-slate-950 border border-amber-500/30 text-center space-y-1">
+                <span class="text-[10px] font-mono uppercase text-slate-400 block">Data Final Estimada do Prazo</span>
+                <span id="law-deadline-result" class="text-base font-mono font-bold text-amber-300">03/12/2026</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tool 2: Caderno de Vade Mecum, Artigos & Súmulas Favoritas -->
+          <div class="lg:col-span-2 cold-card p-5 rounded-3xl space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i data-lucide="book-marked" class="w-4 h-4 text-purple-400"></i>
+                  Fichário Rápido: Vade Mecum, Súmulas & Peças (NPJ / OAB)
+                </h4>
+                <p class="text-xs text-slate-400">Salve artigos chave (CF/88, CC, CP, CPC, CLT), súmulas do STF/STJ e roteiros de peças práticas do 6º período.</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 items-end">
+              <div>
+                <label class="text-[11px] text-slate-300 block mb-1">Ramo / Código</label>
+                <select id="law-note-branch" class="w-full px-2.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white">
+                  <option value="Direito Civil / Processo Civil">Civil / Proc. Civil</option>
+                  <option value="Direito Penal / Processo Penal">Penal / Proc. Penal</option>
+                  <option value="Direito Constitucional / Adm.">Constitucional / Adm.</option>
+                  <option value="Direito do Trabalho / CLT">Trabalho / CLT</option>
+                  <option value="Prática Jurídica / NPJ UEMG">NPJ UEMG / Peça Prática</option>
+                </select>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="text-[11px] text-slate-300 block mb-1">Artigo / Súmula / Caso</label>
+                <input type="text" id="law-note-title" placeholder="Ex: Art. 319 CPC (Requisitos da Petição Inicial) ou Súmula Vinculante 11" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white" />
+              </div>
+              <button type="button" onclick="addLawEntry()" class="py-2 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white">
+                + Salvar Registro Jurídico
+              </button>
+            </div>
+            <textarea id="law-note-content" rows="2" placeholder="Anotação jurídica, fundamentação legal ou observação para a aula/estágio na UEMG Frutal..." class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"></textarea>
+
+            <div id="law-entries-list" class="space-y-2.5 max-h-64 overflow-y-auto"></div>
           </div>
         </div>
       </section>
@@ -1475,6 +1884,25 @@
            TAB 8: MEU PERFIL (PERSONALIZAÇÃO DO ESTUDANTE)
            ========================================== -->
       <section id="tab-profile" class="hidden space-y-6">
+        <!-- Seletor e Gerenciador de Múltiplos Perfis (Você & Sua Namorada) -->
+        <div class="cold-card p-6 rounded-3xl space-y-4 border border-purple-500/30 shadow-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h4 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5 text-purple-400"></i>
+                Perfis Independentes do Roma (Multi-Usuário)
+              </h4>
+              <p class="text-xs text-slate-400 mt-0.5">Alterne entre você e sua namorada no mesmo aplicativo com 1 clique — cada um terá seus próprios treinos, leituras, matérias, metas e fotos 100% separados.</p>
+            </div>
+            <button type="button" onclick="openCreateNewProfileModal()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white flex items-center gap-1.5 shadow-md">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> + Criar Novo Perfil
+            </button>
+          </div>
+
+          <!-- Active Profiles Grid -->
+          <div id="multi-profiles-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 pt-1"></div>
+        </div>
+
         <div class="cold-card p-6 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div class="flex flex-col sm:flex-row items-center gap-5">
             <div class="relative group">
@@ -1635,6 +2063,18 @@
     <button type="button" onclick="switchTab('reading')" id="mnav-reading" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
       <i data-lucide="book-open" class="w-4 h-4"></i>
       <span class="text-[10px] font-medium mt-0.5">Leitura</span>
+    </button>
+    <button type="button" onclick="switchTab('study')" id="mnav-study" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
+      <i data-lucide="clock" class="w-4 h-4"></i>
+      <span class="text-[10px] font-medium mt-0.5">Estudos</span>
+    </button>
+    <button type="button" onclick="switchTab('couple')" id="mnav-couple" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
+      <i data-lucide="heart-handshake" class="w-4 h-4"></i>
+      <span class="text-[10px] font-medium mt-0.5">Casal</span>
+    </button>
+    <button type="button" onclick="switchTab('law')" id="mnav-law" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
+      <i data-lucide="scale" class="w-4 h-4"></i>
+      <span class="text-[10px] font-medium mt-0.5">Direito</span>
     </button>
     <button type="button" onclick="switchTab('englab')" id="mnav-englab" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
       <i data-lucide="calculator" class="w-4 h-4"></i>
@@ -2378,6 +2818,180 @@
     </div>
   </div>
 
+  <!-- =====================================================
+       MODAL 17: CRIAR NOVO PERFIL INDEPENDENTE
+       ===================================================== -->
+  <div id="create-profile-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0a1528] border border-slate-700 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h4 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5 text-purple-400"></i> Criar Novo Perfil no Roma
+        </h4>
+        <button type="button" onclick="closeCreateNewProfileModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <p class="text-xs text-slate-300">Cada perfil tem seus próprios dados zerados (treinos, leituras, notas e agenda) sem misturar com o outro.</p>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-300 block mb-1">Nome da Pessoa (ex: Minha Namorada / Nome dela)</label>
+          <input type="text" id="new-profile-name" placeholder="Ex: Beatriz / Mariana / Meu Nome" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+        </div>
+        <div>
+          <label class="text-xs text-slate-300 block mb-1">Curso / Ocupação</label>
+          <input type="text" id="new-profile-course" placeholder="Ex: Medicina / Direito / Engenharia" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white" />
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="closeCreateNewProfileModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs text-slate-300">Cancelar</button>
+        <button type="button" onclick="confirmCreateNewProfile()" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white">Criar & Entrar no Perfil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       MODAL 18: SELEÇÃO RÁPIDA DE PERFIL (MOBILE)
+       ===================================================== -->
+  <div id="profile-switch-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0a1528] border border-slate-700 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h4 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="users" class="w-5 h-5 text-purple-400"></i> Trocar de Perfil
+        </h4>
+        <button type="button" onclick="closeProfileSwitchModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div id="mobile-profile-switch-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+      <div class="pt-2 border-t border-slate-800 flex justify-between gap-2">
+        <button type="button" onclick="closeProfileSwitchModal(); openCreateNewProfileModal();" class="w-full py-2 rounded-xl bg-purple-600 text-xs font-semibold text-white">
+          + Criar Novo Perfil
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       MODAL 19: CARD VISUAL AUTOMÁTICO DE DOMINGO (WEEKLY RECAP)
+       ===================================================== -->
+  <div id="sunday-recap-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-gradient-to-br from-[#17112b] via-[#110d20] to-[#0a0814] border-2 border-purple-500/50 rounded-3xl w-full max-w-lg p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-mono uppercase tracking-widest">Relatório Automático de Domingo</span>
+          <h4 class="text-lg font-extrabold text-white mt-1" id="sunday-recap-profile-title">Resumo da Semana — Roma</h4>
+        </div>
+        <button type="button" onclick="closeSundayRecapModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Visual KPI Cards Grid inside Sunday Recap -->
+      <div class="grid grid-cols-2 gap-3.5">
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-1">
+          <span class="text-[10px] font-mono uppercase text-purple-300">Horas de Estudo</span>
+          <p id="recap-study-hours" class="text-2xl font-extrabold text-white font-mono">0h 00m</p>
+          <span id="recap-study-top-subj" class="text-[11px] text-slate-400 block truncate">Nenhuma sessão na semana</span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/30 space-y-1">
+          <span class="text-[10px] font-mono uppercase text-emerald-300">Páginas Lidas</span>
+          <p id="recap-reading-pages" class="text-2xl font-extrabold text-white font-mono">0 págs</p>
+          <span id="recap-reading-speed" class="text-[11px] text-slate-400 block">Velocidade: 0 pág/h</span>
+        </div>
+
+        <div class="col-span-2 p-4 rounded-2xl bg-slate-900/90 border border-pink-500/30 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono uppercase text-pink-300">Livro da Semana & Progresso</span>
+            <span id="recap-book-pct" class="text-xs font-mono font-bold text-emerald-400">0% lido</span>
+          </div>
+          <p id="recap-book-name" class="text-sm font-bold text-white truncate">Nenhum livro em andamento definido</p>
+          <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
+            <div id="recap-book-bar" class="h-full bg-gradient-to-r from-purple-500 to-emerald-400 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/30 space-y-1">
+          <span class="text-[10px] font-mono uppercase text-amber-300">Treinos na Semana</span>
+          <p id="recap-workouts-done" class="text-2xl font-extrabold text-white font-mono">0</p>
+          <span id="recap-workouts-vol" class="text-[11px] text-slate-400 block">Volume: 0 kg</span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-sky-500/30 space-y-1">
+          <span class="text-[10px] font-mono uppercase text-sky-300">Cardio na Semana</span>
+          <p id="recap-cardio-mins" class="text-2xl font-extrabold text-white font-mono">0 min</p>
+          <span id="recap-cardio-km" class="text-[11px] text-slate-400 block">0.0 km acumulados</span>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="closeSundayRecapModal()" class="px-5 py-2 rounded-full bg-cyan-600 text-xs font-semibold text-white">Fechar Resumo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       MODAL 20: ECOSSISTEMA GOOGLE (CALENDAR, DRIVE, DOCS & GEMINI IA)
+       ===================================================== -->
+  <div id="google-hub-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#0a1528] border border-purple-500/40 rounded-3xl w-full max-w-xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h4 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-5 h-5 text-purple-400"></i> Central de Integração Google & Gemini
+          </h4>
+          <p class="text-xs text-slate-400">Exporte seu cronograma para o Google Agenda, envie PDFs para o Google Drive e acione o Gemini com seus dados de estudo.</p>
+        </div>
+        <button type="button" onclick="closeGoogleHubModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Google Calendar Card -->
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase text-purple-300">Google Calendar / iCloud</span>
+            <h5 class="text-xs font-bold text-white mt-0.5">Exportar Cronograma</h5>
+            <p class="text-[11px] text-slate-400 mt-1">Gera o arquivo universal <code class="font-mono">.ics</code> ou abre a criação de evento direto no Google Agenda.</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-2">
+            <button type="button" onclick="exportScheduleToICS()" class="px-3 py-1.5 rounded-xl bg-cyan-600 text-[11px] font-semibold text-white">Baixar .ICS (Agenda)</button>
+            <button type="button" onclick="openGoogleCalendarWeb()" class="px-3 py-1.5 rounded-xl bg-slate-800 text-[11px] text-slate-200">Abrir Google Agenda ↗</button>
+          </div>
+        </div>
+
+        <!-- Google Drive Card -->
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase text-emerald-300">Google Drive & Docs</span>
+            <h5 class="text-xs font-bold text-white mt-0.5">Salvar PDFs & Cadernos na Nuvem</h5>
+            <p class="text-[11px] text-slate-400 mt-1">Baixe seus cadernos consolidados ou abra sua pasta do Google Drive para subir seus PDFs acadêmicos.</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-2">
+            <button type="button" onclick="openGoogleDriveUpload()" class="px-3 py-1.5 rounded-xl bg-emerald-600 text-[11px] font-semibold text-white">Abrir Google Drive ↗</button>
+            <button type="button" onclick="exportNotesForGoogleDocs()" class="px-3 py-1.5 rounded-xl bg-slate-800 text-[11px] text-slate-200">Exportar Cadernos (.doc)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direct Gemini Prompt Assistant -->
+      <div class="p-4 rounded-2xl bg-slate-900 border border-purple-500/30 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-white flex items-center gap-1.5">
+            <i data-lucide="bot" class="w-4 h-4 text-purple-400"></i> Assistente Rápido Google Gemini (Engenharia & Direito UEMG)
+          </span>
+          <span class="text-[10px] font-mono text-purple-300">Copia o contexto + abre o Gemini</span>
+        </div>
+        <select id="gemini-prompt-preset" onchange="fillGeminiPresetPrompt(this.value)" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white">
+          <option value="custom">Escolha um comando inteligente ou escreva abaixo...</option>
+          <option value="eng">💻 Engenharia de Computação: Explicar matéria / revisar algoritmo</option>
+          <option value="law">⚖️ Direito (6º Período UEMG Frutal): Analisar caso prático / jurisprudência / peça</option>
+          <option value="schedule">📅 Produtividade: Otimizar minha rotina e metas da semana</option>
+          <option value="reading">📖 Leitura: Resumir e criar perguntas sobre meu livro atual</option>
+        </select>
+        <textarea id="gemini-prompt-textarea" rows="3" placeholder="Escreva sua dúvida para enviar ao Gemini com o contexto do seu perfil Roma..." class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"></textarea>
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="launchGeminiWithPrompt()" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-1.5">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Copiar Contexto & Abrir Google Gemini ↗
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div id="toast-container" class="fixed bottom-16 md:bottom-6 right-4 z-50 space-y-2 pointer-events-none"></div>
 
@@ -2435,6 +3049,19 @@
         scheduleByPeriod: {},
         customGoals: [],
         goalCalendarLogs: {},
+        readingSubtab: 'diary',
+        currentBook: { title: '', currentPage: 0, totalPages: 300 },
+        wishlistBooks: [],
+        favoriteQuotes: [],
+        studySubjectsBank: [],
+        activeStudySubject: '',
+        studySessions: [],
+        studyChartRange: 'week',
+        coupleSharedGoals: [
+          { id: 'cg-1', title: 'Meta de Leitura Diária do Casal', metric: 'reading_day', target: 30 },
+          { id: 'cg-2', title: 'Treinos Concluídos na Semana (Juntos)', metric: 'workouts_week', target: 8 }
+        ],
+        lawEntries: [],
         readingLogs: [],
         readBooks: [],
         grades: [],
@@ -2559,6 +3186,13 @@
       if (parsed.goalCalendarLogs && typeof parsed.goalCalendarLogs === 'object') state.goalCalendarLogs = parsed.goalCalendarLogs;
       if (Array.isArray(parsed.readingLogs)) state.readingLogs = parsed.readingLogs;
       if (Array.isArray(parsed.readBooks)) state.readBooks = parsed.readBooks;
+      if (parsed.currentBook && typeof parsed.currentBook === 'object') state.currentBook = parsed.currentBook;
+      if (Array.isArray(parsed.wishlistBooks)) state.wishlistBooks = parsed.wishlistBooks;
+      if (Array.isArray(parsed.favoriteQuotes)) state.favoriteQuotes = parsed.favoriteQuotes;
+      if (Array.isArray(parsed.studySubjectsBank)) state.studySubjectsBank = parsed.studySubjectsBank;
+      if (Array.isArray(parsed.studySessions)) state.studySessions = parsed.studySessions;
+      if (Array.isArray(parsed.coupleSharedGoals)) state.coupleSharedGoals = parsed.coupleSharedGoals;
+      if (Array.isArray(parsed.lawEntries)) state.lawEntries = parsed.lawEntries;
       if (Array.isArray(parsed.logicChallenges)) state.logicChallenges = parsed.logicChallenges;
       if (parsed.profile && typeof parsed.profile === 'object') {
         state.profile = Object.assign({}, defaults.profile, parsed.profile);
@@ -2591,7 +3225,7 @@
       } catch (e) {}
 
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(getStorageKeyForProfile(currentProfileId)) || localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsedLocal = JSON.parse(raw);
           if (parsedLocal) candidates.push(parsedLocal);
@@ -2625,7 +3259,8 @@
                 if (parsedRestored) {
                   applyLoadedState(parsedRestored);
                   applyTheme();
-                  switchTab(state.activeTab || 'dashboard');
+                  switchTab(state.activeTab || 'home');
+      if (new Date().getDay() === 0) { setTimeout(openSundayRecapModal, 600); }
                 }
               }
             });
@@ -2647,6 +3282,7 @@
       const serialized = JSON.stringify(state);
       try {
         localStorage.setItem(STORAGE_KEY, serialized);
+        localStorage.setItem(getStorageKeyForProfile(currentProfileId), serialized);
       } catch (e) {}
       try {
         window.name = 'ROMA_STATE:' + serialized;
@@ -2672,6 +3308,7 @@
         sumEl.textContent = `${state.activeWorkoutWeek} • Volume: ${totalVol.toLocaleString('pt-BR')} kg • Salvo ✓ (${timeStr})`;
       }
       updateBadgesAndKPIs();
+      scheduleCloudPush();
     }
 
     function showToast(msg, type = 'info') {
@@ -2693,7 +3330,7 @@
     // ==========================================
     function switchTab(tabId) {
       state.activeTab = tabId;
-      const tabs = ['home', 'dashboard', 'academic', 'workouts', 'schedule', 'reading', 'englab', 'coding', 'profile'];
+      const tabs = ['home', 'dashboard', 'academic', 'workouts', 'schedule', 'reading', 'study', 'couple', 'law', 'englab', 'coding', 'profile'];
       const titles = {
         home: ['Página Inicial', 'Acesso limpo, minimalista e intuitivo aos seus estudos, treinos, leituras e agenda.'],
         reading: ['Hábito de Leitura & Estatísticas', 'Registre páginas lidas por dia, calcule sua velocidade de leitura e avalie seus livros concluídos.'],
@@ -2703,6 +3340,9 @@
         schedule: ['Cronograma Semanal Adaptável', 'Grade flexível de horários para conciliar faculdade, laboratório, projetos e treinos.'],
         englab: ['Cálculo de Notas & Simulador de CR', 'Adicione suas matérias do semestre e acompanhe suas médias e coeficiente de rendimento.'],
         coding: ['Laboratório de Programação & Lógica', 'Pratique algoritmos, lógica de programação e conversão de bases numéricas.'],
+        study: ['Sessões de Estudo & Gráfico de Tempo', 'Cronometre seu tempo por matéria com banco automático e gráfico semanal ou mensal.'],
+        couple: ['Metas Compartilhadas do Casal', 'Acompanhe seu progresso comparado ao da sua namorada em leitura, treinos e estudos.'],
+        law: ['Hub Direito • UEMG Frutal (6º Período)', 'Calculadora de prazos processuais CPC, Vade Mecum rápido, peças práticas e NPJ.'],
         profile: ['Meu Perfil — Roma', 'Personalize seu nome, foto de perfil, curso, semestre e metas pessoais.']
       };
 
@@ -2743,6 +3383,9 @@
       if (tabId === 'reading') renderReading();
       if (tabId === 'englab') renderEngLab();
       if (tabId === 'coding') renderLogicTrainer();
+      if (tabId === 'study') { renderStudyTab(); setTimeout(updateStudyChart, 60); }
+      if (tabId === 'couple') { renderCoupleTab(); syncAllFromSupabase(false); }
+      if (tabId === 'law') renderLawTab();
       if (tabId === 'profile') renderProfile();
 
       if (window.lucide) lucide.createIcons();
@@ -3066,6 +3709,9 @@
                 <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/80">
                   <button type="button" onclick="openPdfReader('${p.id}')" class="flex-1 py-2 px-3 rounded-xl bg-cyan-600/90 hover:bg-cyan-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition">
                     <i data-lucide="book-open-check" class="w-3.5 h-3.5"></i> Abrir PDF & Notas
+                  </button>
+                  <button type="button" onclick="sendPdfToGoogleDrive('${p.id}')" class="p-2 rounded-xl bg-slate-800 hover:bg-purple-950 text-slate-300 hover:text-purple-300 transition" title="Salvar/Enviar PDF para o Google Drive">
+                    <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i>
                   </button>
                   <button type="button" onclick="deletePdf('${p.id}')" class="p-2 rounded-xl bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-300 transition" title="Remover PDF" aria-label="Remover PDF">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -4385,6 +5031,392 @@
     // PÁGINA INICIAL (MINIMALISTA), BANCO DE EXERCÍCIOS, LEITURA & PRODUTIVIDADE
     // ==========================================
 
+
+
+    // ==========================================
+    // SUPABASE CLOUD SYNC ENGINE (TEMPO REAL ENTRE APARELHOS)
+    // ==========================================
+    const SUPABASE_URL = 'https://hekuzxekogampnylpzft.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_9jn67ZzEnMNF1X73r--Bxw_IsmeK4Zv';
+    let cloudSyncDebounce = null;
+
+    function setCloudStatus(text, ok = true) {
+      const lbl = document.getElementById('cloud-sync-label');
+      const dot = document.getElementById('cloud-sync-dot');
+      if (lbl) lbl.textContent = text;
+      if (dot) {
+        dot.className = ok
+          ? 'w-2 h-2 rounded-full bg-emerald-400'
+          : 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+      }
+    }
+
+    function supabaseHeaders(extra = {}) {
+      return Object.assign({
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      }, extra);
+    }
+
+    async function pushProfileToSupabase(profId, profState) {
+      if (!SUPABASE_URL || !SUPABASE_KEY) return;
+      try {
+        setCloudStatus('Salvando na nuvem...', false);
+        const payload = {
+          profile_id: profId,
+          display_name: (profState.profile && profState.profile.name) || profId,
+          state_json: profState,
+          updated_at: new Date().toISOString()
+        };
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/roma_profiles?on_conflict=profile_id`, {
+          method: 'POST',
+          headers: supabaseHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          setCloudStatus('Salvo na Nuvem ✓', true);
+        } else {
+          setCloudStatus('Salvo Localmente (Verifique SQL)', false);
+        }
+      } catch (e) {
+        setCloudStatus('Offline (Salvo Localmente)', false);
+      }
+    }
+
+    async function pushManifestToSupabase() {
+      if (!SUPABASE_URL || !SUPABASE_KEY) return;
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/roma_profiles?on_conflict=profile_id`, {
+          method: 'POST',
+          headers: supabaseHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+          body: JSON.stringify({
+            profile_id: '__manifest__',
+            display_name: 'Roma Profiles Manifest',
+            state_json: { profiles: profilesManifest, updatedAt: Date.now() },
+            updated_at: new Date().toISOString()
+          })
+        });
+      } catch (e) {}
+    }
+
+    async function pullAllProfilesFromSupabase() {
+      if (!SUPABASE_URL || !SUPABASE_KEY) return [];
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/roma_profiles?select=profile_id,display_name,state_json,updated_at`, {
+          method: 'GET',
+          headers: supabaseHeaders()
+        });
+        if (!res.ok) return [];
+        const rows = await res.json();
+        return Array.isArray(rows) ? rows : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    async function syncAllFromSupabase(showFeedback = false) {
+      setCloudStatus('Sincronizando...', false);
+      const rows = await pullAllProfilesFromSupabase();
+      if (!rows || rows.length === 0) {
+        // First time: push local active profile up to Supabase
+        await pushManifestToSupabase();
+        await pushProfileToSupabase(currentProfileId, state);
+        if (showFeedback) showToast('Conectado ao Supabase! Dados iniciais enviados para a nuvem.', 'success');
+        return;
+      }
+
+      // 1. Update manifest if cloud has newer/more profiles
+      const manifestRow = rows.find(r => r.profile_id === '__manifest__');
+      if (manifestRow && manifestRow.state_json && Array.isArray(manifestRow.state_json.profiles)) {
+        manifestRow.state_json.profiles.forEach(cp => {
+          const localIdx = profilesManifest.findIndex(lp => lp.id === cp.id);
+          if (localIdx === -1) {
+            profilesManifest.push(cp);
+          } else {
+            profilesManifest[localIdx] = Object.assign({}, profilesManifest[localIdx], cp);
+          }
+        });
+        saveProfilesManifest();
+      }
+
+      // 2. Sync each profile snapshot into localStorage if cloud _updatedAt is newer
+      rows.forEach(r => {
+        if (r.profile_id === '__manifest__' || !r.state_json) return;
+        const cloudState = r.state_json;
+        const cloudTs = Number(cloudState._updatedAt) || 0;
+        let localTs = 0;
+        try {
+          const rawLocal = localStorage.getItem(getStorageKeyForProfile(r.profile_id));
+          if (rawLocal) localTs = Number(JSON.parse(rawLocal)._updatedAt) || 0;
+        } catch (e) {}
+
+        if (cloudTs > localTs) {
+          try {
+            localStorage.setItem(getStorageKeyForProfile(r.profile_id), JSON.stringify(cloudState));
+          } catch (e) {}
+          if (r.profile_id === currentProfileId) {
+            applyLoadedState(cloudState);
+          }
+        }
+      });
+
+      setCloudStatus('Nuvem Sincronizada ✓', true);
+      syncProfileUI();
+      renderMultiProfilesGrid();
+      const activeTab = state.activeTab || 'home';
+      if (activeTab === 'home') renderHome();
+      if (activeTab === 'couple') renderCoupleTab();
+      if (activeTab === 'reading') renderReading();
+      if (activeTab === 'study') { renderStudyTab(); updateStudyChart(); }
+      if (activeTab === 'workouts') renderWorkouts();
+      if (activeTab === 'schedule') renderSchedule();
+      if (activeTab === 'academic') renderAcademic();
+      if (activeTab === 'law') renderLawTab();
+      if (showFeedback) showToast('Todos os perfis sincronizados com o Supabase!', 'success');
+    }
+
+    function scheduleCloudPush() {
+      clearTimeout(cloudSyncDebounce);
+      cloudSyncDebounce = setTimeout(() => {
+        pushProfileToSupabase(currentProfileId, state);
+      }, 850);
+    }
+
+    // ==========================================
+    // ENGINE MULTI-PERFIL (ROMA PROFILES)
+    // ==========================================
+    const MULTI_PROFILES_KEY = 'roma_profiles_manifest_v1';
+    let currentProfileId = 'profile_1';
+    let profilesManifest = [
+      { id: 'profile_1', name: 'Meu Perfil (Eng. Comp.)', course: 'Engenharia de Computação • 2º Período', role: 'eng', photo: '' },
+      { id: 'profile_2', name: 'Namorada (Direito UEMG)', course: 'Direito • 6º Período (UEMG Frutal)', role: 'law', photo: '' }
+    ];
+
+    function loadProfilesManifest() {
+      try {
+        const raw = localStorage.getItem(MULTI_PROFILES_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            profilesManifest = parsed;
+            if (!profilesManifest.some(p => p.id === 'profile_2')) {
+              profilesManifest.push({ id: 'profile_2', name: 'Namorada (Direito UEMG)', course: 'Direito • 6º Período (UEMG Frutal)', role: 'law', photo: '' });
+            }
+          }
+        }
+      } catch (e) {}
+
+      try {
+        const lastActive = localStorage.getItem('roma_active_profile_id');
+        if (lastActive && profilesManifest.some(p => p.id === lastActive)) {
+          currentProfileId = lastActive;
+        } else {
+          currentProfileId = profilesManifest[0].id;
+        }
+      } catch (e) {}
+    }
+
+    function saveProfilesManifest() {
+      try {
+        localStorage.setItem(MULTI_PROFILES_KEY, JSON.stringify(profilesManifest));
+        localStorage.setItem('roma_active_profile_id', currentProfileId);
+      } catch (e) {}
+    }
+
+    function getStorageKeyForProfile(profId) {
+      return `roma_state_${profId}`;
+    }
+
+    function openCreateNewProfileModal() {
+      document.getElementById('new-profile-name').value = '';
+      document.getElementById('new-profile-course').value = '';
+      document.getElementById('create-profile-modal').classList.remove('hidden');
+    }
+
+    function closeCreateNewProfileModal() {
+      document.getElementById('create-profile-modal').classList.add('hidden');
+    }
+
+    function confirmCreateNewProfile() {
+      const name = (document.getElementById('new-profile-name')?.value || '').trim();
+      const course = (document.getElementById('new-profile-course')?.value || '').trim() || 'Estudos & Vida';
+      if (!name) {
+        showToast('Digite um nome para o novo perfil.');
+        return;
+      }
+
+      // Save current profile before switching
+      saveState();
+
+      const newId = 'profile_' + Date.now();
+      profilesManifest.push({
+        id: newId,
+        name,
+        course,
+        photo: ''
+      });
+
+      // Initialize fresh zeroed state for this profile
+      const freshState = getDefaultState();
+      freshState.profile.name = name;
+      freshState.profile.course = course;
+
+      try {
+        localStorage.setItem(getStorageKeyForProfile(newId), JSON.stringify(freshState));
+      } catch (e) {}
+
+      currentProfileId = newId;
+      saveProfilesManifest();
+      pushManifestToSupabase();
+      pushProfileToSupabase(newId, freshState);
+      closeCreateNewProfileModal();
+
+      // Switch to the newly created profile
+      state = freshState;
+      saveState();
+      syncProfileUI();
+      applyTheme();
+      renderMultiProfilesGrid();
+      switchTab('home');
+      showToast(`Bem-vindo(a), ${name}! Perfil individual ativo no Roma.`, 'success');
+    }
+
+    function switchProfile(targetProfId) {
+      if (targetProfId === currentProfileId) return;
+      // 1. Save current profile state before departing
+      saveState();
+
+      // 2. Switch ID
+      currentProfileId = targetProfId;
+      saveProfilesManifest();
+
+      // 3. Load target profile state
+      const raw = localStorage.getItem(getStorageKeyForProfile(targetProfId));
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          applyLoadedState(parsed);
+        } catch (e) {
+          state = getDefaultState();
+        }
+      } else {
+        state = getDefaultState();
+        const profObj = profilesManifest.find(p => p.id === targetProfId);
+        if (profObj) {
+          state.profile.name = profObj.name;
+          state.profile.course = profObj.course;
+        }
+      }
+
+      saveState();
+      syncProfileUI();
+      applyTheme();
+      renderMultiProfilesGrid();
+      switchTab('home');
+      showToast(`Perfil alterado para "${state.profile.name}"!`, 'success');
+    }
+
+    function deleteProfile(profId) {
+      if (profilesManifest.length <= 1) {
+        showToast('Você precisa manter pelo menos um perfil no aplicativo.');
+        return;
+      }
+      const target = profilesManifest.find(p => p.id === profId);
+      const name = target ? target.name : 'Perfil';
+      profilesManifest = profilesManifest.filter(p => p.id !== profId);
+      try {
+        localStorage.removeItem(getStorageKeyForProfile(profId));
+      } catch (e) {}
+
+      if (currentProfileId === profId) {
+        currentProfileId = profilesManifest[0].id;
+        const raw = localStorage.getItem(getStorageKeyForProfile(currentProfileId));
+        if (raw) {
+          try { applyLoadedState(JSON.parse(raw)); } catch (e) { state = getDefaultState(); }
+        } else {
+          state = getDefaultState();
+        }
+      }
+      saveProfilesManifest();
+      saveState();
+      syncProfileUI();
+      renderMultiProfilesGrid();
+      switchTab('home');
+      showToast(`Perfil "${name}" excluído.`);
+    }
+
+    function renderMultiProfilesGrid() {
+      // 1. Update Top Bar Select dropdown
+      const topSelect = document.getElementById('topbar-profile-select');
+      if (topSelect) {
+        topSelect.innerHTML = profilesManifest.map(p => `
+          <option value="${p.id}" ${p.id === currentProfileId ? 'selected' : ''}>👤 ${escapeHtml(p.name)}</option>
+        `).join('');
+      }
+
+      // 2. Render Cards in Meu Perfil
+      const grid = document.getElementById('multi-profiles-grid');
+      if (grid) {
+        grid.innerHTML = profilesManifest.map(p => {
+          const isAct = p.id === currentProfileId;
+          const initials = (p.name || 'RM').split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || 'RM';
+          const avatarHtml = p.photo
+            ? `<img src="${p.photo}" alt="${escapeHtml(p.name)}" class="w-10 h-10 rounded-2xl object-cover border border-purple-500/40" />`
+            : `<div class="w-10 h-10 rounded-2xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center font-mono font-bold text-xs text-purple-300">${initials}</div>`;
+          return `
+            <div class="p-4 rounded-2xl cold-card flex flex-col justify-between space-y-3 ${isAct ? 'border-2 border-purple-500/80 bg-purple-950/20 shadow-md shadow-purple-500/10' : ''}">
+              <div class="flex items-center gap-3">
+                ${avatarHtml}
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5">
+                    <h5 class="text-sm font-bold text-white truncate">${escapeHtml(p.name)}</h5>
+                    ${isAct ? `<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold">Ativo</span>` : ''}
+                  </div>
+                  <p class="text-xs text-slate-400 truncate">${escapeHtml(p.course || '')}</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/70">
+                ${isAct
+                  ? `<span class="text-[11px] font-mono text-purple-300">Perfil Selecionado</span>`
+                  : `<button type="button" onclick="switchProfile('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white transition">Entrar neste Perfil</button>`}
+                ${profilesManifest.length > 1
+                  ? `<button type="button" onclick="deleteProfile('${p.id}')" class="p-1.5 text-slate-400 hover:text-rose-400" title="Excluir Perfil"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`
+                  : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 3. Render Mobile Switch List
+      const mobList = document.getElementById('mobile-profile-switch-list');
+      if (mobList) {
+        mobList.innerHTML = profilesManifest.map(p => {
+          const isAct = p.id === currentProfileId;
+          return `
+            <button type="button" onclick="switchProfile('${p.id}'); closeProfileSwitchModal();" class="w-full p-3 rounded-2xl flex items-center justify-between border text-left transition ${isAct ? 'bg-purple-600/20 border-purple-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-300'}">
+              <div>
+                <span class="text-xs font-bold block">${escapeHtml(p.name)}</span>
+                <span class="text-[10px] text-slate-400">${escapeHtml(p.course || '')}</span>
+              </div>
+              ${isAct ? `<span class="text-xs text-emerald-400 font-bold">✓ Ativo</span>` : `<span class="text-xs text-purple-400 font-medium">Trocar</span>`}
+            </button>
+          `;
+        }).join('');
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openProfileSwitchModal() {
+      renderMultiProfilesGrid();
+      document.getElementById('profile-switch-modal').classList.remove('hidden');
+    }
+    function closeProfileSwitchModal() {
+      document.getElementById('profile-switch-modal').classList.add('hidden');
+    }
+
     // ==========================================
     // MEU PERFIL (NOME, FOTO, CURSO & METAS)
     // ==========================================
@@ -4392,6 +5424,14 @@
       if (!state.profile) state.profile = getDefaultState().profile;
       const p = state.profile;
       const name = (p.name || 'Estudante').trim() || 'Estudante';
+      const profEntry = profilesManifest.find(pr => pr.id === currentProfileId);
+      if (profEntry) {
+        profEntry.name = name;
+        profEntry.course = p.course || '';
+        profEntry.photo = p.photo || '';
+        saveProfilesManifest();
+        renderMultiProfilesGrid();
+      }
       const course = (p.course || 'Engenharia de Computação').trim();
       const sem = (p.semester || '2º Período').trim();
       const initials = name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || 'RM';
@@ -4452,6 +5492,7 @@
       setVal('prof-goal-workouts', p.workoutGoal || 5);
       setVal('prof-input-github', p.github);
       syncProfileUI();
+      renderMultiProfilesGrid();
       renderCustomGoals();
       renderGoalsCalendars();
       if (window.lucide) lucide.createIcons();
@@ -4888,6 +5929,7 @@
       if (titleInp) titleInp.value = '';
       autoEvaluateGoalsForDate('2026-11-11');
       saveState();
+      renderMultiProfilesGrid();
       renderCustomGoals();
       renderGoalsCalendars();
       showToast(`Meta "${title}" adicionada e vinculada ao calendário!`, 'success');
@@ -4896,6 +5938,7 @@
     function deleteCustomPersonalGoal(id) {
       state.customGoals = (state.customGoals || []).filter(g => g.id !== id);
       saveState();
+      renderMultiProfilesGrid();
       renderCustomGoals();
       renderGoalsCalendars();
     }
@@ -5026,6 +6069,7 @@
       state.goalCalendarLogs[dateStr].goals[goalId] = Boolean(isMet);
       delete state.goalCalendarLogs[dateStr].override;
       saveState();
+      renderMultiProfilesGrid();
       renderCustomGoals();
       renderGoalsCalendars();
       if (!document.getElementById('day-goals-modal').classList.contains('hidden')) {
@@ -5103,6 +6147,7 @@
         state.goalCalendarLogs[selectedCalendarDayStr].goals[g.id] = (status === 'hit');
       });
       saveState();
+      renderMultiProfilesGrid();
       renderCustomGoals();
       renderGoalsCalendars();
       closeDayGoalsModal();
@@ -5156,7 +6201,807 @@
       if (el) el.textContent = `${pph} pág/h (${ppm} pág/min)`;
     }
 
+
+    // ==========================================
+    // LEITURA: SUB-ABAS, PROGRESSO %, WISHLIST & CITAÇÕES
+    // ==========================================
+    function setReadingSubtab(sub) {
+      state.readingSubtab = sub;
+      ['diary', 'reviewed', 'wishlist', 'quotes'].forEach(k => {
+        const btn = document.getElementById(`rsub-${k}`);
+        const view = document.getElementById(`reading-subview-${k}`);
+        if (btn) {
+          btn.className = k === sub
+            ? 'px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition'
+            : 'px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition';
+        }
+        if (view) view.classList.toggle('hidden', k !== sub);
+      });
+      renderReadingExtras();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function saveCurrentBookProgress() {
+      if (!state.currentBook) state.currentBook = { title: '', currentPage: 0, totalPages: 300 };
+      state.currentBook.title = document.getElementById('current-reading-title')?.value || '';
+      state.currentBook.currentPage = Math.max(0, parseInt(document.getElementById('current-reading-page')?.value, 10) || 0);
+      state.currentBook.totalPages = Math.max(1, parseInt(document.getElementById('current-reading-total')?.value, 10) || 1);
+      updateCurrentBookProgressUI();
+      saveState();
+    }
+
+    function updateCurrentBookProgressUI() {
+      const cb = state.currentBook || { title: '', currentPage: 0, totalPages: 300 };
+      const tEl = document.getElementById('current-reading-title');
+      const pEl = document.getElementById('current-reading-page');
+      const totEl = document.getElementById('current-reading-total');
+      if (tEl && document.activeElement !== tEl) tEl.value = cb.title || '';
+      if (pEl && document.activeElement !== pEl) pEl.value = cb.currentPage || 0;
+      if (totEl && document.activeElement !== totEl) totEl.value = cb.totalPages || 300;
+
+      const pct = Math.min(100, Math.round(((Number(cb.currentPage) || 0) / Math.max(1, Number(cb.totalPages) || 1)) * 100));
+      const badge = document.getElementById('current-book-pct-badge');
+      const bar = document.getElementById('current-book-progress-bar');
+      if (badge) badge.textContent = `${pct}% concluído (${cb.currentPage || 0}/${cb.totalPages || 300} págs)`;
+      if (bar) bar.style.width = `${pct}%`;
+    }
+
+    function addWishlistBook() {
+      const title = (document.getElementById('wish-book-title')?.value || '').trim();
+      const author = (document.getElementById('wish-book-author')?.value || '').trim() || 'Autor';
+      const priority = document.getElementById('wish-book-priority')?.value || 'Alta';
+      if (!title) {
+        showToast('Digite o título do livro que deseja ler.');
+        return;
+      }
+      if (!Array.isArray(state.wishlistBooks)) state.wishlistBooks = [];
+      state.wishlistBooks.unshift({
+        id: 'wb-' + Date.now(),
+        title,
+        author,
+        priority
+      });
+      document.getElementById('wish-book-title').value = '';
+      document.getElementById('wish-book-author').value = '';
+      saveState();
+      renderReadingExtras();
+      showToast(`"${title}" adicionado à sua Wishlist!`, 'success');
+    }
+
+    function startReadingFromWishlist(wbId) {
+      const wb = (state.wishlistBooks || []).find(b => b.id === wbId);
+      if (!wb) return;
+      state.currentBook = { title: wb.title, currentPage: 0, totalPages: 300 };
+      const logBookInp = document.getElementById('read-log-book');
+      if (logBookInp) logBookInp.value = wb.title;
+      saveState();
+      setReadingSubtab('diary');
+      updateCurrentBookProgressUI();
+      showToast(`Você começou a ler "${wb.title}"!`, 'success');
+    }
+
+    function deleteWishlistBook(wbId) {
+      state.wishlistBooks = (state.wishlistBooks || []).filter(b => b.id !== wbId);
+      saveState();
+      renderReadingExtras();
+    }
+
+    function addFavoriteQuote() {
+      const text = (document.getElementById('quote-text-input')?.value || '').trim();
+      const book = (document.getElementById('quote-book-input')?.value || '').trim() || 'Livro';
+      const page = (document.getElementById('quote-page-input')?.value || '').trim() || '';
+      if (!text) {
+        showToast('Escreva a citação ou trecho favorito.');
+        return;
+      }
+      if (!Array.isArray(state.favoriteQuotes)) state.favoriteQuotes = [];
+      state.favoriteQuotes.unshift({
+        id: 'qt-' + Date.now(),
+        text,
+        book,
+        page
+      });
+      document.getElementById('quote-text-input').value = '';
+      saveState();
+      renderReadingExtras();
+      showToast('Citação salva no seu mural!', 'success');
+    }
+
+    function deleteFavoriteQuote(qId) {
+      state.favoriteQuotes = (state.favoriteQuotes || []).filter(q => q.id !== qId);
+      saveState();
+      renderReadingExtras();
+    }
+
+    function renderReadingExtras() {
+      updateCurrentBookProgressUI();
+
+      // Wishlist grid
+      const wGrid = document.getElementById('reading-wishlist-grid');
+      if (wGrid) {
+        const list = state.wishlistBooks || [];
+        if (list.length === 0) {
+          wGrid.innerHTML = `<p class="text-xs text-slate-400 col-span-full text-center py-4">Sua Wishlist está vazia. Adicione os livros que você planeja ler acima!</p>`;
+        } else {
+          wGrid.innerHTML = list.map(w => `
+            <div class="cold-card p-4 rounded-2xl flex flex-col justify-between space-y-3">
+              <div>
+                <span class="px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 text-[10px] font-mono">Prioridade ${escapeHtml(w.priority)}</span>
+                <h5 class="text-sm font-bold text-white mt-2">${escapeHtml(w.title)}</h5>
+                <p class="text-xs text-slate-400">${escapeHtml(w.author)}</p>
+              </div>
+              <div class="flex items-center justify-between pt-2 border-t border-slate-800/70">
+                <button type="button" onclick="startReadingFromWishlist('${w.id}')" class="px-3 py-1 rounded-xl bg-cyan-600 text-[11px] font-semibold text-white">Começar a Ler →</button>
+                <button type="button" onclick="deleteWishlistBook('${w.id}')" class="text-xs text-slate-500 hover:text-rose-400">Excluir</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Favorite quotes grid
+      const qGrid = document.getElementById('reading-quotes-grid');
+      if (qGrid) {
+        const quotes = state.favoriteQuotes || [];
+        if (quotes.length === 0) {
+          qGrid.innerHTML = `<p class="text-xs text-slate-400 col-span-full text-center py-4">Nenhuma citação favorita salva ainda.</p>`;
+        } else {
+          qGrid.innerHTML = quotes.map(q => `
+            <div class="cold-card p-5 rounded-2xl flex flex-col justify-between space-y-3 border-l-4 border-l-purple-500">
+              <p class="text-xs sm:text-sm text-slate-100 italic leading-relaxed">“${escapeHtml(q.text)}”</p>
+              <div class="flex items-center justify-between pt-2 border-t border-slate-800/60 text-[11px]">
+                <span class="font-mono text-purple-300 font-semibold">${escapeHtml(q.book)} ${q.page ? '• ' + escapeHtml(q.page) : ''}</span>
+                <button type="button" onclick="deleteFavoriteQuote('${q.id}')" class="text-slate-500 hover:text-rose-400">Remover</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    // ==========================================
+    // SESSÕES DE ESTUDO (CRONÔMETRO POR MATÉRIA, BANCO AUTOMÁTICO & GRÁFICO)
+    // ==========================================
+    let studyTimerSec = 0;
+    let studyTimerRunning = false;
+    let studyTimerInterval = null;
+    let studyChartInstance = null;
+
+    function addStudySubjectToBank() {
+      const inp = document.getElementById('new-study-subject-input');
+      const name = (inp ? inp.value : '').trim();
+      if (!name) {
+        showToast('Digite o nome da matéria.');
+        return;
+      }
+      if (!Array.isArray(state.studySubjectsBank)) state.studySubjectsBank = [];
+      if (!state.studySubjectsBank.includes(name)) {
+        state.studySubjectsBank.push(name);
+      }
+      state.activeStudySubject = name;
+      if (inp) inp.value = '';
+      saveState();
+      renderStudyTab();
+      showToast(`Matéria "${name}" salva automaticamente para suas sessões!`, 'success');
+    }
+
+    function selectActiveStudySubject(subj) {
+      state.activeStudySubject = subj;
+      saveState();
+      renderStudyTab();
+    }
+
+    function removeStudySubjectFromBank(idx) {
+      if (!Array.isArray(state.studySubjectsBank)) return;
+      const removed = state.studySubjectsBank[idx];
+      state.studySubjectsBank.splice(idx, 1);
+      if (state.activeStudySubject === removed) {
+        state.activeStudySubject = state.studySubjectsBank[0] || '';
+      }
+      saveState();
+      renderStudyTab();
+    }
+
+    function toggleStudySessionTimer() {
+      if (!state.activeStudySubject && (!state.studySubjectsBank || state.studySubjectsBank.length === 0)) {
+        showToast('Adicione e selecione uma matéria antes de iniciar o cronômetro.');
+        return;
+      }
+      if (!state.activeStudySubject) {
+        state.activeStudySubject = state.studySubjectsBank[0];
+      }
+      studyTimerRunning = !studyTimerRunning;
+      const btn = document.getElementById('study-timer-start-btn');
+      if (studyTimerRunning) {
+        if (btn) btn.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i> <span>Pausar Estudo</span>`;
+        clearInterval(studyTimerInterval);
+        studyTimerInterval = setInterval(() => {
+          studyTimerSec++;
+          updateStudyTimerDisplay();
+        }, 1000);
+      } else {
+        clearInterval(studyTimerInterval);
+        if (btn) btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> <span>Continuar Estudo</span>`;
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function updateStudyTimerDisplay() {
+      const h = String(Math.floor(studyTimerSec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((studyTimerSec % 3600) / 60)).padStart(2, '0');
+      const sec = String(studyTimerSec % 60).padStart(2, '0');
+      const el = document.getElementById('study-timer-display');
+      if (el) el.textContent = `${h}:${m}:${sec}`;
+    }
+
+    function resetStudySessionTimer() {
+      clearInterval(studyTimerInterval);
+      studyTimerRunning = false;
+      studyTimerSec = 0;
+      updateStudyTimerDisplay();
+      const btn = document.getElementById('study-timer-start-btn');
+      if (btn) btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> <span>Iniciar Estudo</span>`;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function finishAndLogStudyTimer() {
+      clearInterval(studyTimerInterval);
+      studyTimerRunning = false;
+      const subj = state.activeStudySubject || (state.studySubjectsBank && state.studySubjectsBank[0]) || 'Estudo Geral';
+      const mins = Math.max(1, Math.round(studyTimerSec / 60) || 1);
+      if (!Array.isArray(state.studySessions)) state.studySessions = [];
+      state.studySessions.unshift({
+        id: 'ss-' + Date.now(),
+        subject: subj,
+        mins,
+        date: '2026-11-12'
+      });
+      resetStudySessionTimer();
+      saveState();
+      renderStudyTab();
+      updateStudyChart();
+      showToast(`Sessão de ${mins} min em "${subj}" salva automaticamente!`, 'success');
+    }
+
+    function logManualStudySession() {
+      const sel = document.getElementById('manual-study-subject-select');
+      const subj = (sel && sel.value) || state.activeStudySubject || 'Estudo Geral';
+      const mins = Math.max(1, parseInt(document.getElementById('manual-study-mins')?.value, 10) || 30);
+      if (!Array.isArray(state.studySubjectsBank)) state.studySubjectsBank = [];
+      if (!state.studySubjectsBank.includes(subj)) state.studySubjectsBank.push(subj);
+      if (!Array.isArray(state.studySessions)) state.studySessions = [];
+      state.studySessions.unshift({
+        id: 'ss-' + Date.now(),
+        subject: subj,
+        mins,
+        date: '2026-11-12'
+      });
+      saveState();
+      renderStudyTab();
+      updateStudyChart();
+      showToast(`${mins} min de "${subj}" registrados!`, 'success');
+    }
+
+    function deleteStudySession(id) {
+      state.studySessions = (state.studySessions || []).filter(s => s.id !== id);
+      saveState();
+      renderStudyTab();
+      updateStudyChart();
+    }
+
+    function setStudyChartRange(range) {
+      state.studyChartRange = range;
+      const wBtn = document.getElementById('study-chart-week-btn');
+      const mBtn = document.getElementById('study-chart-month-btn');
+      if (wBtn) wBtn.className = `px-2.5 py-1 rounded-lg text-[11px] font-semibold ${range === 'week' ? 'bg-cyan-600 text-white' : 'text-slate-400'}`;
+      if (mBtn) mBtn.className = `px-2.5 py-1 rounded-lg text-[11px] font-semibold ${range === 'month' ? 'bg-cyan-600 text-white' : 'text-slate-400'}`;
+      saveState();
+      updateStudyChart();
+    }
+
+    function renderStudyTab() {
+      if (!Array.isArray(state.studySubjectsBank)) state.studySubjectsBank = [];
+      const activeLbl = document.getElementById('study-active-subject-label');
+      if (activeLbl) {
+        activeLbl.textContent = state.activeStudySubject
+          ? `Matéria em foco: ${state.activeStudySubject}`
+          : 'Selecione ou cadastre uma matéria abaixo para iniciar';
+      }
+
+      const pillsEl = document.getElementById('study-subjects-bank-pills');
+      if (pillsEl) {
+        if (state.studySubjectsBank.length === 0) {
+          pillsEl.innerHTML = `<p class="text-xs text-slate-400">Nenhuma matéria salva ainda. Digite o nome da matéria acima e clique em <strong>+ Salvar Matéria</strong>.</p>`;
+        } else {
+          pillsEl.innerHTML = state.studySubjectsBank.map((subj, idx) => {
+            const isAct = state.activeStudySubject === subj;
+            return `
+              <div class="inline-flex items-center rounded-xl border ${isAct ? 'bg-cyan-600 border-purple-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-300'}">
+                <button type="button" onclick="selectActiveStudySubject('${escapeHtml(subj)}')" class="px-3 py-1.5 text-xs font-medium">${escapeHtml(subj)}</button>
+                <button type="button" onclick="removeStudySubjectFromBank(${idx})" class="pr-2.5 text-xs opacity-60 hover:opacity-100">✕</button>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      const manualSel = document.getElementById('manual-study-subject-select');
+      if (manualSel) {
+        manualSel.innerHTML = state.studySubjectsBank.length === 0
+          ? `<option value="Estudo Geral">Estudo Geral (Adicione matérias acima)</option>`
+          : state.studySubjectsBank.map(sp => `<option value="${escapeHtml(sp)}" ${sp === state.activeStudySubject ? 'selected' : ''}>${escapeHtml(sp)}</option>`).join('');
+      }
+
+      const histEl = document.getElementById('study-sessions-history-list');
+      const sessions = state.studySessions || [];
+      const totalMins = sessions.reduce((a, b) => a + (Number(b.mins) || 0), 0);
+      const badgeStudy = document.getElementById('badge-study');
+      if (badgeStudy) badgeStudy.textContent = `${(totalMins / 60).toFixed(1)}h`;
+
+      if (histEl) {
+        if (sessions.length === 0) {
+          histEl.innerHTML = `<p class="text-xs text-slate-400">Nenhuma sessão de estudo registrada ainda.</p>`;
+        } else {
+          histEl.innerHTML = sessions.map(ss => `
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between text-xs">
+              <div>
+                <span class="font-bold text-white">${escapeHtml(ss.subject)}</span>
+                <span class="text-[10px] font-mono text-slate-400 ml-2">${escapeHtml(ss.date)}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-mono font-bold text-purple-300">${ss.mins} min</span>
+                <button type="button" onclick="deleteStudySession('${ss.id}')" class="text-slate-500 hover:text-rose-400">✕</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function updateStudyChart() {
+      const canvas = document.getElementById('studySubjectsChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+      const sessions = state.studySessions || [];
+      const totalsBySubj = {};
+      sessions.forEach(ss => {
+        const sName = ss.subject || 'Outros';
+        totalsBySubj[sName] = (totalsBySubj[sName] || 0) + (Number(ss.mins) || 0);
+      });
+
+      const labels = Object.keys(totalsBySubj);
+      const dataMins = labels.map(k => totalsBySubj[k]);
+
+      if (studyChartInstance) studyChartInstance.destroy();
+
+      const palette = ['#a855f7', '#2dd4bf', '#facc15', '#fb7185', '#38bdf8', '#818cf8', '#34d399'];
+      studyChartInstance = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: labels.length ? labels : ['Sem registros ainda'],
+          datasets: [{
+            data: dataMins.length ? dataMins : [1],
+            backgroundColor: labels.length ? palette.slice(0, labels.length) : ['#292145'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { family: 'Inter', size: 11 } } }
+          }
+        }
+      });
+
+      const legendEl = document.getElementById('study-chart-summary-legend');
+      if (legendEl) {
+        if (labels.length === 0) {
+          legendEl.innerHTML = `<p class="text-slate-400 text-center">Inicie o cronômetro ou lance minutos para ver a distribuição por matéria.</p>`;
+        } else {
+          legendEl.innerHTML = labels.map((lb, i) => `
+            <div class="flex items-center justify-between">
+              <span class="flex items-center gap-2 text-slate-200"><span class="w-2.5 h-2.5 rounded-full" style="background:${palette[i % palette.length]}"></span>${escapeHtml(lb)}</span>
+              <span class="font-mono font-bold text-purple-300">${totalsBySubj[lb]} min (${(totalsBySubj[lb]/60).toFixed(1)}h)</span>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    // ==========================================
+    // METAS DO CASAL (COMPARATIVO ENTRE PERFIL 1 E PERFIL 2)
+    // ==========================================
+    function getProfileDataSnapshot(profId) {
+      if (profId === currentProfileId) return state;
+      try {
+        const raw = localStorage.getItem(getStorageKeyForProfile(profId));
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return getDefaultState();
+    }
+
+    function computeProfileMetrics(st) {
+      const logs = st.readingLogs || [];
+      const pagesDay = logs.slice(0, 1).reduce((a, b) => a + (Number(b.pages) || 0), 0);
+      const pagesWeek = logs.reduce((a, b) => a + (Number(b.pages) || 0), 0);
+      const wkObj = (st.workoutWeeks && st.workoutWeeks[st.activeWorkoutWeek || 'Semana 1']) || { exercises: [], cardio: [] };
+      const workoutsDone = (wkObj.exercises || []).filter(e => e.done).length;
+      const cardioMins = (wkObj.cardio || []).reduce((a, b) => a + (Number(b.duration) || 0), 0);
+      const studyMins = (st.studySessions || []).reduce((a, b) => a + (Number(b.mins) || 0), 0);
+      return { pagesDay, pagesWeek, workoutsDone, cardioMins, studyMins };
+    }
+
+    function renderCoupleTab() {
+      const p1Info = profilesManifest[0] || { id: 'profile_1', name: 'Você (Eng. Comp.)' };
+      const p2Info = profilesManifest[1] || { id: 'profile_2', name: 'Namorada (Direito UEMG)' };
+      const st1 = getProfileDataSnapshot(p1Info.id);
+      const st2 = getProfileDataSnapshot(p2Info.id);
+      const m1 = computeProfileMetrics(st1);
+      const m2 = computeProfileMetrics(st2);
+
+      const cardsEl = document.getElementById('couple-comparison-cards');
+      if (cardsEl) {
+        const buildCompCard = (title, unit, v1, v2, color1, color2) => {
+          const tot = Math.max(1, v1 + v2);
+          const pct1 = v1 + v2 === 0 ? 50 : Math.round((v1 / tot) * 100);
+          const pct2 = 100 - pct1;
+          return `
+            <div class="cold-card p-5 rounded-3xl space-y-3">
+              <div class="flex items-center justify-between">
+                <h5 class="text-xs font-mono uppercase text-slate-400">${title}</h5>
+                <span class="text-xs font-mono font-bold text-white">Total: ${v1 + v2} ${unit}</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <div class="p-3 rounded-2xl bg-slate-900 border border-purple-500/30">
+                  <span class="text-[11px] text-purple-300 font-semibold block truncate">${escapeHtml(p1Info.name)}</span>
+                  <span class="text-xl font-extrabold text-white font-mono">${v1} ${unit}</span>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-900 border border-pink-500/30">
+                  <span class="text-[11px] text-pink-300 font-semibold block truncate">${escapeHtml(p2Info.name)}</span>
+                  <span class="text-xl font-extrabold text-white font-mono">${v2} ${unit}</span>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                  <span>${pct1}%</span>
+                  <span>Barra Comparativa</span>
+                  <span>${pct2}%</span>
+                </div>
+                <div class="w-full h-2.5 rounded-full bg-slate-900 overflow-hidden flex">
+                  <div style="width:${pct1}%; background:${color1}" class="h-full transition-all"></div>
+                  <div style="width:${pct2}%; background:${color2}" class="h-full transition-all"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        };
+
+        cardsEl.innerHTML =
+          buildCompCard('Leitura Acumulada', 'págs', m1.pagesWeek, m2.pagesWeek, '#a855f7', '#ec4899') +
+          buildCompCard('Exercícios Concluídos', 'ex.', m1.workoutsDone, m2.workoutsDone, '#a855f7', '#ec4899') +
+          buildCompCard('Tempo de Estudo', 'min', m1.studyMins, m2.studyMins, '#a855f7', '#ec4899');
+      }
+
+      // Render Shared Couple Goals with Combined Progress Bars
+      const listEl = document.getElementById('couple-shared-goals-list');
+      if (listEl) {
+        const goals = state.coupleSharedGoals || [];
+        listEl.innerHTML = goals.map(cg => {
+          let val1 = 0, val2 = 0, unit = '';
+          if (cg.metric === 'reading_day') { val1 = m1.pagesDay; val2 = m2.pagesDay; unit = 'págs'; }
+          else if (cg.metric === 'reading_week') { val1 = m1.pagesWeek; val2 = m2.pagesWeek; unit = 'págs'; }
+          else if (cg.metric === 'workouts_week') { val1 = m1.workoutsDone; val2 = m2.workoutsDone; unit = 'exercícios'; }
+          else { val1 = m1.studyMins; val2 = m2.studyMins; unit = 'min'; }
+
+          const combined = val1 + val2;
+          const pctTotal = Math.min(100, Math.round((combined / Math.max(1, cg.target)) * 100));
+          const pct1 = Math.min(100, Math.round((val1 / Math.max(1, cg.target)) * 100));
+          const pct2 = Math.min(100 - pct1, Math.round((val2 / Math.max(1, cg.target)) * 100));
+
+          return `
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="text-sm font-bold text-white">${escapeHtml(cg.title)}</h5>
+                  <p class="text-[11px] text-slate-400">Você: <strong class="text-purple-300">${val1} ${unit}</strong> + Ela: <strong class="text-pink-300">${val2} ${unit}</strong> = <strong>${combined} / ${cg.target} ${unit}</strong></p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded-full bg-purple-950 text-purple-300 font-mono text-xs font-bold">${pctTotal}%</span>
+                  <button type="button" onclick="deleteSharedCoupleGoal('${cg.id}')" class="text-slate-500 hover:text-rose-400">✕</button>
+                </div>
+              </div>
+              <div class="w-full h-3 rounded-full bg-slate-950 border border-slate-800 overflow-hidden flex">
+                <div style="width:${pct1}%" class="h-full bg-purple-500 transition-all" title="Sua contribuição"></div>
+                <div style="width:${pct2}%" class="h-full bg-pink-500 transition-all" title="Contribuição dela"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function addSharedCoupleGoal() {
+      const title = (document.getElementById('couple-goal-title')?.value || '').trim();
+      const metric = document.getElementById('couple-goal-metric')?.value || 'reading_day';
+      const target = Math.max(1, parseInt(document.getElementById('couple-goal-target')?.value, 10) || 30);
+      if (!title) {
+        showToast('Digite um título para a meta conjunta do casal.');
+        return;
+      }
+      if (!Array.isArray(state.coupleSharedGoals)) state.coupleSharedGoals = [];
+      state.coupleSharedGoals.push({ id: 'cg-' + Date.now(), title, metric, target });
+      document.getElementById('couple-goal-title').value = '';
+      saveState();
+      renderCoupleTab();
+      showToast('Meta conjunta do casal adicionada!', 'success');
+    }
+
+    function deleteSharedCoupleGoal(id) {
+      state.coupleSharedGoals = (state.coupleSharedGoals || []).filter(g => g.id !== id);
+      saveState();
+      renderCoupleTab();
+    }
+
+    // ==========================================
+    // HUB DIREITO • UEMG FRUTAL (6º PERÍODO)
+    // ==========================================
+    function calculateLegalDeadline() {
+      const startStr = document.getElementById('law-deadline-start')?.value || '2026-11-12';
+      const days = Math.max(1, parseInt(document.getElementById('law-deadline-days')?.value, 10) || 15);
+      const mode = document.getElementById('law-deadline-type')?.value || 'business';
+      const d = new Date(startStr + 'T12:00:00');
+      let remaining = days;
+      while (remaining > 0) {
+        d.setDate(d.getDate() + 1);
+        const dow = d.getDay();
+        if (mode === 'business') {
+          if (dow !== 0 && dow !== 6) remaining--;
+        } else {
+          remaining--;
+        }
+      }
+      // If continuous deadline ends on weekend, prorrogates to Monday
+      if (d.getDay() === 6) d.setDate(d.getDate() + 2);
+      if (d.getDay() === 0) d.setDate(d.getDate() + 1);
+
+      const resEl = document.getElementById('law-deadline-result');
+      if (resEl) {
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        resEl.textContent = `${dd}/${mm}/${yyyy} (${mode === 'business' ? 'Dias Úteis CPC' : 'Corridos CPP'})`;
+      }
+    }
+
+    function addLawEntry() {
+      const branch = document.getElementById('law-note-branch')?.value || 'Direito Civil';
+      const title = (document.getElementById('law-note-title')?.value || '').trim();
+      const content = (document.getElementById('law-note-content')?.value || '').trim();
+      if (!title) {
+        showToast('Informe o Artigo, Súmula ou Peça Jurídica.');
+        return;
+      }
+      if (!Array.isArray(state.lawEntries)) state.lawEntries = [];
+      state.lawEntries.unshift({
+        id: 'law-' + Date.now(),
+        branch,
+        title,
+        content
+      });
+      document.getElementById('law-note-title').value = '';
+      document.getElementById('law-note-content').value = '';
+      saveState();
+      renderLawTab();
+      showToast('Registro jurídico salvo no Hub Direito UEMG!', 'success');
+    }
+
+    function deleteLawEntry(id) {
+      state.lawEntries = (state.lawEntries || []).filter(l => l.id !== id);
+      saveState();
+      renderLawTab();
+    }
+
+    function renderLawTab() {
+      calculateLegalDeadline();
+      const listEl = document.getElementById('law-entries-list');
+      if (!listEl) return;
+      const entries = state.lawEntries || [];
+      if (entries.length === 0) {
+        listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Nenhum artigo, súmula ou peça cadastrada ainda. Use os campos acima para montar seu fichário jurídico da UEMG Frutal!</p>`;
+      } else {
+        listEl.innerHTML = entries.map(item => `
+          <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-mono">${escapeHtml(item.branch)}</span>
+              <button type="button" onclick="deleteLawEntry('${item.id}')" class="text-xs text-slate-500 hover:text-rose-400">✕</button>
+            </div>
+            <h5 class="text-xs font-bold text-white">${escapeHtml(item.title)}</h5>
+            ${item.content ? `<p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(item.content)}</p>` : ''}
+          </div>
+        `).join('');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ==========================================
+    // CARD VISUAL AUTOMÁTICO DE DOMINGO (WEEKLY RECAP)
+    // ==========================================
+    function openSundayRecapModal() {
+      const pName = (state.profile && state.profile.name) || 'Estudante';
+      const titleEl = document.getElementById('sunday-recap-profile-title');
+      if (titleEl) titleEl.textContent = `Resumo Semanal de Domingo — ${pName}`;
+
+      // 1. Study hours
+      const sessions = state.studySessions || [];
+      const totalStudyMins = sessions.reduce((a, b) => a + (Number(b.mins) || 0), 0);
+      const sh = Math.floor(totalStudyMins / 60);
+      const sm = totalStudyMins % 60;
+      const studyHoursEl = document.getElementById('recap-study-hours');
+      const studyTopEl = document.getElementById('recap-study-top-subj');
+      if (studyHoursEl) studyHoursEl.textContent = `${sh}h ${String(sm).padStart(2, '0')}m`;
+      if (studyTopEl) {
+        studyTopEl.textContent = sessions.length > 0 ? `${sessions.length} sessão(ões) concluída(s)` : 'Nenhuma sessão registrada';
+      }
+
+      // 2. Reading pages & speed
+      const rLogs = state.readingLogs || [];
+      const totalPages = rLogs.reduce((a, b) => a + (Number(b.pages) || 0), 0);
+      const totalRMins = rLogs.reduce((a, b) => a + (Number(b.mins) || 0), 0);
+      const spd = totalRMins > 0 ? ((totalPages / totalRMins) * 60).toFixed(1) : '0.0';
+      const rPagesEl = document.getElementById('recap-reading-pages');
+      const rSpeedEl = document.getElementById('recap-reading-speed');
+      if (rPagesEl) rPagesEl.textContent = `${totalPages} págs`;
+      if (rSpeedEl) rSpeedEl.textContent = `Velocidade média: ${spd} pág/h`;
+
+      // 3. Current book & % read
+      const cb = state.currentBook || { title: '', currentPage: 0, totalPages: 300 };
+      const bookName = cb.title || (rLogs[0] ? rLogs[0].book : 'Nenhum livro ativo informado');
+      const pct = cb.title ? Math.min(100, Math.round(((Number(cb.currentPage) || 0) / Math.max(1, Number(cb.totalPages) || 1)) * 100)) : (totalPages > 0 ? Math.min(100, Math.round((totalPages / 250) * 100)) : 0);
+      const bNameEl = document.getElementById('recap-book-name');
+      const bPctEl = document.getElementById('recap-book-pct');
+      const bBarEl = document.getElementById('recap-book-bar');
+      if (bNameEl) bNameEl.textContent = bookName;
+      if (bPctEl) bPctEl.textContent = `${pct}% lido`;
+      if (bBarEl) bBarEl.style.width = `${pct}%`;
+
+      // 4. Workouts & Cardio
+      const activeWk = (state.workoutWeeks && state.workoutWeeks[state.activeWorkoutWeek || 'Semana 1']) || { exercises: [], cardio: [] };
+      const doneEx = (activeWk.exercises || []).filter(e => e.done).length;
+      const totVol = (activeWk.exercises || []).reduce((a, e) => a + (Number(e.sets) * Number(e.reps) * Number(e.weight)), 0);
+      const cMins = (activeWk.cardio || []).reduce((a, c) => a + (Number(c.duration) || 0), 0);
+      const cKm = (activeWk.cardio || []).reduce((a, c) => a + (Number(c.distance) || 0), 0);
+
+      const wDoneEl = document.getElementById('recap-workouts-done');
+      const wVolEl = document.getElementById('recap-workouts-vol');
+      const cMinsEl = document.getElementById('recap-cardio-mins');
+      const cKmEl = document.getElementById('recap-cardio-km');
+      if (wDoneEl) wDoneEl.textContent = `${doneEx} ex.`;
+      if (wVolEl) wVolEl.textContent = `Volume: ${totVol.toLocaleString('pt-BR')} kg`;
+      if (cMinsEl) cMinsEl.textContent = `${cMins} min`;
+      if (cKmEl) cKmEl.textContent = `${cKm.toFixed(1)} km na semana`;
+
+      document.getElementById('sunday-recap-modal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeSundayRecapModal() {
+      document.getElementById('sunday-recap-modal').classList.add('hidden');
+    }
+
+    // ==========================================
+    // ECOSSISTEMA GOOGLE (CALENDAR, DRIVE, DOCS & GEMINI)
+    // ==========================================
+    function openGoogleHubModal(preset = '') {
+      if (preset) {
+        const sel = document.getElementById('gemini-prompt-preset');
+        if (sel) {
+          sel.value = preset;
+          fillGeminiPresetPrompt(preset);
+        }
+      }
+      document.getElementById('google-hub-modal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeGoogleHubModal() {
+      document.getElementById('google-hub-modal').classList.add('hidden');
+    }
+
+    function exportScheduleToICS() {
+      ensureSchedulePeriodInitialized();
+      const items = state.schedule || [];
+      let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Roma Workspace//PT-BR\r\n";
+      items.forEach((it, idx) => {
+        ics += "BEGIN:VEVENT\r\n";
+        ics += `UID:roma-event-${idx}-${Date.now()}@roma.app\r\n`;
+        ics += `SUMMARY:${it.title} (${it.category})\r\n`;
+        ics += `DESCRIPTION:Dia: ${it.day} | Horário: ${it.time} | Local: ${it.room}\r\n`;
+        ics += `LOCATION:${it.room || 'Roma'}\r\n`;
+        ics += "DTSTART:20261116T110000Z\r\n";
+        ics += "DTEND:20261116T130000Z\r\n";
+        ics += "END:VEVENT\r\n";
+      });
+      ics += "END:VCALENDAR";
+
+      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Cronograma_Roma_GoogleCalendar.ics';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+      showToast('Arquivo .ICS gerado! Importe no Google Agenda ou Calendário do iPhone.', 'success');
+    }
+
+    function openGoogleCalendarWeb() {
+      window.open('https://calendar.google.com/calendar/r', '_blank', 'noopener');
+    }
+
+    function openGoogleDriveUpload() {
+      window.open('https://drive.google.com/drive/my-drive', '_blank', 'noopener');
+      showToast('Abrindo Google Drive para upload de seus arquivos!', 'success');
+    }
+
+    function sendPdfToGoogleDrive(pdfId) {
+      const pdf = (state.pdfs || []).find(p => p.id === pdfId);
+      if (pdf && pdf.blobUrl) {
+        const a = document.createElement('a');
+        a.href = pdf.blobUrl;
+        a.download = pdf.title || 'documento.pdf';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => document.body.removeChild(a), 200);
+      }
+      window.open('https://drive.google.com/drive/my-drive', '_blank', 'noopener');
+      showToast('Abrindo Google Drive para salvar o PDF na nuvem!', 'success');
+    }
+
+    function exportNotesForGoogleDocs() {
+      const notes = state.notes || [];
+      const content = notes.map(n => `# ${n.title} (${n.subject})\n${n.content}\n`).join('\n---\n\n') || 'Caderno Roma';
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Cadernos_Roma_GoogleDocs.txt';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+      showToast('Cadernos exportados para importar no Google Docs / Drive!', 'success');
+    }
+
+    function fillGeminiPresetPrompt(preset) {
+      const box = document.getElementById('gemini-prompt-textarea');
+      if (!box) return;
+      const pName = (state.profile && state.profile.name) || 'Estudante';
+      if (preset === 'eng') {
+        box.value = `Olá Gemini! Sou estudante de Engenharia de Computação no 2º período (${pName}). Me ajude a revisar conceitos, complexidade de algoritmos e resolução passo a passo sobre: `;
+      } else if (preset === 'law') {
+        box.value = `Olá Gemini! Sou estudante do 6º período de Direito na UEMG de Frutal (${pName}). Me ajude a estruturar a fundamentação jurídica, artigos aplicáveis (CF/88, CC, CPC, CP) e jurisprudência do STF/STJ sobre: `;
+      } else if (preset === 'schedule') {
+        box.value = `Olá Gemini! Com base nas minhas metas de estudo, leitura e treinos no aplicativo Roma, sugira uma divisão de horários otimizada para minha semana.`;
+      } else if (preset === 'reading') {
+        const bTitle = (state.currentBook && state.currentBook.title) || 'meu livro atual';
+        box.value = `Olá Gemini! Estou lendo "${bTitle}". Faça um resumo dos conceitos principais e me faça 3 perguntas práticas para fixar o conteúdo.`;
+      }
+    }
+
+    function launchGeminiWithPrompt() {
+      const box = document.getElementById('gemini-prompt-textarea');
+      if (box && box.value.trim()) {
+        box.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        showToast('Prompt copiado! Cole diretamente no Google Gemini que foi aberto.', 'success');
+      }
+      window.open('https://gemini.google.com/app', '_blank', 'noopener');
+    }
+
     function renderReading() {
+      renderReadingExtras();
       const dateInp = document.getElementById('read-log-date');
       if (dateInp && !dateInp.value) {
         dateInp.value = '2026-11-11';
@@ -5765,7 +7610,8 @@
         state = Object.assign(getDefaultState(), parsed);
         saveState();
         closeSyncModal();
-        switchTab(state.activeTab || 'dashboard');
+        switchTab(state.activeTab || 'home');
+      if (new Date().getDay() === 0) { setTimeout(openSundayRecapModal, 600); }
         showToast('Estado do aplicativo RReis atualizado com sucesso!', 'success');
       } catch (e) {
         showToast('Formato JSON inválido. Verifique os dados colados.');
@@ -5790,6 +7636,7 @@
 
     // Initialize Application with async multi-layer state restoration
     window.addEventListener('DOMContentLoaded', async () => {
+      loadProfilesManifest();
       await loadState();
       syncProfileUI();
       applyTheme();
@@ -5798,14 +7645,17 @@
         const lbl = document.getElementById('font-scale-label');
         if (lbl) lbl.textContent = 'Texto: Ampliado (A+)';
       }
-      switchTab(state.activeTab || 'dashboard');
+      switchTab(state.activeTab || 'home');
+      if (new Date().getDay() === 0) { setTimeout(openSundayRecapModal, 600); }
       updatePomodoroDisplay();
       if (window.lucide) lucide.createIcons();
+      syncAllFromSupabase(false);
     });
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         saveState();
+        pushProfileToSupabase(currentProfileId, state);
       }
     });
     window.addEventListener('pagehide', () => {
