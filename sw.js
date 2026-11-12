@@ -1,8 +1,16 @@
-const CACHE_NAME = 'rreis-pwa-v3';
+const CACHE_NAME = 'roma-pwa-v4';
 const ASSETS = ['./index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        ASSETS.map((url) =>
+          fetch(url, { cache: 'no-store' }).then((res) => cache.put(url, res)).catch(() => {})
+        )
+      )
+    )
+  );
   self.skipWaiting();
 });
 
@@ -16,13 +24,17 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  const isHtml = req.mode === 'navigate' || req.url.endsWith('.html') || req.url.endsWith('/');
   event.respondWith(
-    fetch(event.request)
+    fetch(req, isHtml ? { cache: 'no-store' } : undefined)
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+        }
         return res;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(req))
   );
 });

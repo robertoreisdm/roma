@@ -369,36 +369,89 @@
       border-color: rgba(168, 85, 247, 0.45) !important;
     }
 
+
+    /* Option 7: Command Center, Compact Reading Player & Spotify Floating Mini-Player */
+    .command-search-bar {
+      background: linear-gradient(135deg, rgba(32, 22, 56, 0.92), rgba(18, 13, 34, 0.96));
+      border: 1px solid rgba(168, 85, 247, 0.42);
+      box-shadow: 0 10px 30px -10px rgba(147, 51, 234, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .command-search-bar:focus-within {
+      border-color: rgba(192, 132, 252, 0.85);
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
+    }
+    .compact-reading-player {
+      background: linear-gradient(135deg, rgba(35, 24, 62, 0.95) 0%, rgba(20, 14, 38, 0.98) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.38);
+      box-shadow: 0 16px 36px -12px rgba(88, 28, 135, 0.45);
+    }
+    #spotify-mini-player {
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+      touch-action: pan-x;
+      user-select: none;
+    }
+    #spotify-mini-player.swiped-down {
+      transform: translate(-50%, 160%) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    html:not(.dark) .command-search-bar,
+    html:not(.dark) .compact-reading-player {
+      background: linear-gradient(135deg, #ffffff 0%, #f5f0ff 100%) !important;
+      border-color: #d8b4fe !important;
+    }
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row bg-[#060d1a] text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200">
 
   <!-- MOBILE TOP HEADER -->
-  <header class="md:hidden sticky top-0 z-30 cold-glass px-4 py-3 flex items-center justify-between border-b border-slate-800/80">
-    <div class="flex items-center gap-2.5">
-      <div class="w-9 h-9 rounded-2xl bg-[#181a1f] dark:bg-white flex items-center justify-center shadow-md font-mono font-bold text-white dark:text-[#181a1f] text-sm" id="mobile-brand-logo">
-        RM
+  <header class="md:hidden sticky top-0 z-30 cold-glass px-4 py-2.5 flex flex-col gap-2.5 border-b border-slate-800/80">
+    <div class="flex items-center justify-between w-full">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-2xl bg-[#181a1f] dark:bg-white flex items-center justify-center shadow-md font-mono font-bold text-white dark:text-[#181a1f] text-sm" id="mobile-brand-logo">
+          RM
+        </div>
+        <div>
+          <span class="font-bold tracking-tight text-white text-base">Roma</span>
+          <span id="mobile-header-course" class="block text-[11px] text-purple-400 font-mono">Eng. Computação • 2º Per.</span>
+        </div>
       </div>
-      <div>
-        <span class="font-bold tracking-tight text-white text-base">Roma</span>
-        <span id="mobile-header-course" class="block text-[11px] text-purple-400 font-mono">Eng. Computação • 2º Per.</span>
+      <div class="flex items-center gap-1.5">
+        <button type="button" onclick="togglePomodoroMini()" class="hidden" aria-hidden="true">
+          <span id="mobile-pomo-display">25:00</span>
+        </button>
+        <button type="button" id="restore-mini-player-btn" onclick="restoreMiniPlayer()" class="hidden px-2.5 py-1 rounded-full bg-purple-600/30 border border-purple-400/60 text-[10px] font-mono font-bold text-purple-200 items-center gap-1 animate-pulse" title="Reabrir Mini-Player do Cronômetro">
+          <i data-lucide="clock" class="w-3 h-3"></i> <span id="restore-mini-player-time">00:00</span>
+        </button>
+        <button type="button" onclick="openProfileSwitchModal()" class="focus-ring p-2 rounded-full bg-purple-950/90 border border-purple-600/50 text-purple-300" title="Trocar Perfil" aria-label="Trocar Perfil">
+          <i data-lucide="users" class="w-4 h-4"></i>
+        </button>
+        <button type="button" onclick="toggleDarkMode()" class="focus-ring p-2 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300" aria-label="Alternar Modo Escuro">
+          <i data-lucide="moon" class="w-4 h-4" id="mobile-theme-icon"></i>
+        </button>
+        <button type="button" onclick="openInstallModal()" class="focus-ring p-2 rounded-full bg-cyan-600 text-white" aria-label="Baixar e Instalar no Celular" title="Baixar e adicionar à tela inicial">
+          <i data-lucide="download" class="w-4 h-4"></i>
+        </button>
+        <button type="button" onclick="openSyncModal()" class="focus-ring p-2 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300 hover:text-cyan-300" aria-label="Sincronizar ou exportar dados">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+        </button>
+        <button type="button" onclick="toggleMobileCommandDrawer()" class="focus-ring p-2 rounded-full bg-purple-950/90 border border-purple-500/40 text-purple-200" title="Menu Lateral Command Center" aria-label="Menu Lateral">
+          <i data-lucide="panel-right-open" class="w-4 h-4"></i>
+        </button>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <button type="button" onclick=" togglePomodoroMini()" class="hidden" aria-hidden="true">
-        <span id="mobile-pomo-display">25:00</span>
-      </button>
-      <button type="button" onclick="openProfileSwitchModal()" class="focus-ring p-2 rounded-full bg-purple-950/90 border border-purple-600/50 text-purple-300" title="Trocar Perfil" aria-label="Trocar Perfil">
-        <i data-lucide="users" class="w-4 h-4"></i>
-      </button>
-      <button type="button" onclick="toggleDarkMode()" class="focus-ring p-2 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300" aria-label="Alternar Modo Escuro">
-        <i data-lucide="moon" class="w-4 h-4" id="mobile-theme-icon"></i>
-      </button>
-      <button type="button" onclick="openInstallModal()" class="focus-ring p-2 rounded-full bg-cyan-600 text-white" aria-label="Baixar e Instalar no Celular" title="Baixar e adicionar à tela inicial">
-        <i data-lucide="download" class="w-4 h-4"></i>
-      </button>
-      <button type="button" onclick="openSyncModal()" class="focus-ring p-2 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300 hover:text-cyan-300" aria-label="Sincronizar ou exportar dados">
-        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+
+    <!-- Second Row (Option 7): Command & Gemini AI Bar + Dual Profile Quick Switch -->
+    <div class="flex items-center gap-2 w-full">
+      <div class="command-search-bar flex-1 flex items-center gap-2 px-3 py-2 rounded-2xl">
+        <i data-lucide="sparkles" class="w-4 h-4 text-purple-400 shrink-0"></i>
+        <input type="text" id="mobile-command-input" placeholder="Pergunte ao Gemini ou pesquise no Roma..." onkeydown="if(event.key==='Enter')handleCommandBarSubmit(this.value)" class="w-full bg-transparent text-xs text-white placeholder-slate-400 focus:outline-none" />
+        <button type="button" onclick="handleCommandBarSubmit(document.getElementById('mobile-command-input').value)" class="px-2 py-0.5 rounded-lg bg-purple-600/40 text-[10px] font-mono font-bold text-purple-200 shrink-0">AI✦</button>
+      </div>
+      <button type="button" onclick="quickTogglePartnerProfile()" id="mobile-dual-profile-pill" class="px-3 py-2 rounded-2xl bg-slate-900 border border-purple-500/40 text-[11px] font-semibold text-purple-200 shrink-0 flex items-center gap-1.5" title="Toque para alternar entre o seu perfil e o dela">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span id="mobile-active-profile-short">Eng.</span>
       </button>
     </div>
   </header>
@@ -572,7 +625,10 @@
           <i data-lucide="type" class="w-3.5 h-3.5 text-cyan-400"></i>
           <span id="font-scale-label">Texto: Normal</span>
         </button>
-        <button type="button" onclick="openGoogleHubModal()" class="px-3.5 py-2 rounded-full bg-slate-900 border border-purple-500/40 hover:border-purple-400 text-xs font-semibold text-purple-200 flex items-center gap-1.5 transition focus-ring" title="Integração Google Calendar, Drive e Gemini">
+        <button type="button" id="desktop-restore-mini-player-btn" onclick="restoreMiniPlayer()" class="hidden px-3 py-1.5 rounded-full bg-purple-600/30 border border-purple-400/60 text-xs font-mono font-bold text-purple-200 items-center gap-1.5 animate-pulse" title="Mostrar Mini-Player Flutuante">
+          <i data-lucide="disc" class="w-3.5 h-3.5"></i> <span id="desktop-restore-mini-player-time">00:00</span>
+        </button>
+        <button type="button" onclick="openGoogleHubModal()"  class="px-3.5 py-2 rounded-full bg-slate-900 border border-purple-500/40 hover:border-purple-400 text-xs font-semibold text-purple-200 flex items-center gap-1.5 transition focus-ring" title="Integração Google Calendar, Drive e Gemini">
           <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400"></i>
           <span>Google & Gemini</span>
         </button>
@@ -630,6 +686,60 @@
             <button type="button" onclick="switchTab('dashboard')" class="px-3.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-xs font-medium text-white transition">
               Abrir Visão Geral Completa →
             </button>
+          </div>
+        </div>
+
+        <!-- OPÇÃO 7: COMMAND BAR & GEMINI IA NO TOPO DO COMMAND CENTER -->
+        <div class="hidden md:flex items-center gap-3">
+          <div class="command-search-bar flex-1 flex items-center gap-3 px-4 py-3 rounded-2xl">
+            <i data-lucide="sparkles" class="w-5 h-5 text-purple-400 shrink-0"></i>
+            <input type="text" id="desktop-command-input" placeholder="Command Center: Pergunte ao Gemini IA ou pesquise matérias, artigos de lei (CPC/LEP), códigos em C ou livros no Roma..." onkeydown="if(event.key==='Enter')handleCommandBarSubmit(this.value)" class="w-full bg-transparent text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none" />
+            <button type="button" onclick="handleCommandBarSubmit(document.getElementById('desktop-command-input').value)" class="px-3 py-1 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-mono font-bold text-white shrink-0 transition">AI ✦</button>
+          </div>
+          <button type="button" onclick="quickTogglePartnerProfile()" class="px-4 py-3 rounded-2xl bg-slate-900 border border-purple-500/40 hover:border-purple-400 text-xs font-semibold text-purple-200 flex items-center gap-2 shrink-0 transition" title="Alternar rapidamente entre seu perfil e o da sua namorada">
+            <i data-lucide="repeat" class="w-4 h-4 text-purple-400"></i>
+            <span>Alternar Perfil (Ele / Ela)</span>
+          </button>
+        </div>
+
+        <!-- OPÇÃO 7 + OPÇÃO 3: PLAYER COMPACTO DE LEITURA (ISOLADO POR PERFIL) + WIDGETS ADAPTADOS AO PERFIL ATIVO -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Compact Reading Studio Player (Specific to the active profile) -->
+          <div class="lg:col-span-5 compact-reading-player p-5 rounded-3xl flex flex-col justify-between gap-4 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-full bg-purple-950/90 border border-purple-500/30 text-[10px] font-mono uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+                <i data-lucide="book-open" class="w-3 h-3"></i> Estúdio de Leitura • <span id="home-reader-profile-tag">Meu Perfil</span>
+              </span>
+              <button type="button" onclick="switchTab('reading')" class="text-[11px] font-semibold text-purple-300 hover:text-white flex items-center gap-1">
+                Abrir Estúdio <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <div id="home-compact-book-cover" class="w-16 h-20 rounded-2xl bg-gradient-to-br from-purple-700 via-indigo-900 to-slate-950 border border-purple-400/40 flex flex-col items-center justify-center p-2 text-center shadow-lg shrink-0">
+                <i data-lucide="book-open" class="w-5 h-5 text-purple-200 mb-1"></i>
+                <span class="text-[9px] font-mono text-purple-200 uppercase leading-tight line-clamp-2" id="home-compact-book-mini">LIVRO ATUAL</span>
+              </div>
+
+              <div class="flex-1 min-w-0 space-y-1.5">
+                <h4 id="home-compact-book-title" class="text-base font-extrabold text-white truncate">Definir Livro Atual</h4>
+                <p id="home-compact-book-pages" class="text-xs text-slate-300 font-mono">Página 0 de 300 • 0 pág/h</p>
+                <div class="w-full h-2 rounded-full bg-slate-950/90 border border-purple-500/20 overflow-hidden">
+                  <div id="home-compact-book-bar" class="h-full rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-500 to-emerald-400 transition-all" style="width: 0%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] font-mono pt-0.5">
+                  <span id="home-compact-book-pct" class="text-purple-300 font-bold">0% concluído</span>
+                  <button type="button" onclick="promptQuickUpdateCurrentBook()" class="text-slate-400 hover:text-white underline">Editar livro/pág.</button>
+                </div>
+              </div>
+
+              <button type="button" onclick="startOrToggleReadingFromCompactPlayer()" id="home-compact-reading-play-btn" class="w-12 h-12 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center shadow-lg shrink-0 transition" title="Iniciar/Pausar Cronômetro de Leitura">
+                <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 cold-card p-5 rounded-3xl flex flex-col justify-between gap-4 border border-purple-500/30" id="profile-adaptive-command-widget">
           </div>
         </div>
 
@@ -1640,6 +1750,119 @@
           </button>
         </div>
 
+
+        <!-- MÓDULO ESPECIAL: ESTÁGIO TJMG — EXECUÇÃO PENAL (LEP / SEEU: DIAS-MULTA, PROGRESSÃO DE REGIME & REMIÇÃO) -->
+        <div class="cold-card p-6 rounded-3xl space-y-5 border border-purple-500/40">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 text-[10px] font-mono uppercase tracking-wider">Estágio TJMG • Vara de Execuções Penais (SEEU)</span>
+              <h4 class="text-base font-bold text-white mt-1 flex items-center gap-2">
+                <i data-lucide="gavel" class="w-5 h-5 text-amber-400"></i>
+                Calculadoras Automáticas de Execução Penal (Multa Penal, Custas UFEMG, Remição & Progressão)
+              </h4>
+              <p class="text-xs text-slate-400">Calcule rapidamente valores de dias-multa, custas processuais e remição de pena e copie a memória de cálculo pronta para colar no SEEU/PJe.</p>
+            </div>
+            <button type="button" onclick="copyTjmgCertidao()" class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 shadow-md">
+              <i data-lucide="copy" class="w-4 h-4"></i> Copiar Memória de Cálculo p/ Processo
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <h5 class="text-xs font-bold text-amber-300 uppercase font-mono">1. Pena de Multa (Art. 49 CP) & Custas</h5>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">Qtd. Dias-Multa</label>
+                  <input type="number" id="tjmg-dias-multa" value="10" min="1" oninput="computeTjmgExecucaoPenal()" class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">Fração do Sal. Mín.</label>
+                  <select id="tjmg-fracao-multa" onchange="computeTjmgExecucaoPenal()" class="w-full px-2 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono">
+                    <option value="30">1/30 do SM</option>
+                    <option value="15">1/15 do SM</option>
+                    <option value="10">1/10 do SM</option>
+                    <option value="2">1/2 do SM</option>
+                    <option value="1">1 Salário Mínimo</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">Salário Mínimo (R$)</label>
+                  <input type="number" id="tjmg-salario-base" value="1518" step="1" oninput="computeTjmgExecucaoPenal()" class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">Custas Processuais (R$)</label>
+                  <input type="number" id="tjmg-custas-val" value="0" step="10" oninput="computeTjmgExecucaoPenal()" class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-amber-500/30 flex items-center justify-between">
+                <span class="text-[11px] text-slate-400">Total (Multa + Custas):</span>
+                <span id="tjmg-multa-result" class="text-sm font-mono font-bold text-amber-300">R$ 506,00</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <h5 class="text-xs font-bold text-purple-300 uppercase font-mono">2. Remição (Art. 126 LEP)</h5>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-[10px] text-slate-400 block mb-1">Dias Trabalhados</label>
+                  <input type="number" id="tjmg-rem-trab" value="30" min="0" oninput="computeTjmgExecucaoPenal()" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 block mb-1">Horas Estudo</label>
+                  <input type="number" id="tjmg-rem-estudo" value="36" min="0" oninput="computeTjmgExecucaoPenal()" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 block mb-1">Livros (CNJ)</label>
+                  <input type="number" id="tjmg-rem-livros" value="1" min="0" oninput="computeTjmgExecucaoPenal()" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-purple-500/30 space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-slate-400">Total de Dias Remidos:</span>
+                  <span id="tjmg-remicao-result" class="text-sm font-mono font-bold text-emerald-400">17 dias remidos</span>
+                </div>
+                <p id="tjmg-remicao-sobra" class="text-[10px] font-mono text-slate-400">Sobras p/ próximo cálculo: 0d trab / 0h est.</p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <h5 class="text-xs font-bold text-emerald-300 uppercase font-mono">3. Progressão de Regime (Art. 112 LEP)</h5>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-[10px] text-slate-400 block mb-1">Anos</label>
+                  <input type="number" id="tjmg-pena-anos" value="5" min="0" oninput="computeTjmgExecucaoPenal()" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 block mb-1">Meses</label>
+                  <input type="number" id="tjmg-pena-meses" value="4" min="0" oninput="computeTjmgExecucaoPenal()" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 block mb-1">% LEP</label>
+                  <select id="tjmg-lep-pct" onchange="computeTjmgExecucaoPenal()" class="w-full px-1.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono">
+                    <option value="16">16% (Prim. s/ viol.)</option>
+                    <option value="20">20% (Reinc. s/ viol.)</option>
+                    <option value="25">25% (Prim. c/ viol.)</option>
+                    <option value="30">30% (Reinc. c/ viol.)</option>
+                    <option value="40">40% (Hediondo Prim.)</option>
+                    <option value="50">50% (Hediondo Morte)</option>
+                    <option value="60">60% (Hediondo Reinc.)</option>
+                    <option value="70">70% (Hed. Reinc. Morte)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-slate-400">Tempo p/ Progredir:</span>
+                  <span id="tjmg-prog-result" class="text-sm font-mono font-bold text-emerald-300">312 dias (0a 10m 12d)</span>
+                </div>
+                <p id="tjmg-prog-liquido" class="text-[10px] font-mono text-slate-400">Descontando remição: 295 dias</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Tool 1: Calculadora de Prazos Processuais (CPC - Dias Úteis) -->
           <div class="cold-card p-5 rounded-3xl space-y-4">
@@ -2039,7 +2262,112 @@
   </main>
 
   <!-- MOBILE BOTTOM NAVIGATION BAR -->
-  <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 cold-glass border-t border-slate-800/90 px-1.5 py-1.5 flex items-center justify-around overflow-x-auto" aria-label="Navegação Mobile">
+    <!-- =====================================================
+       SPOTIFY-STYLE FLOATING MINI-PLAYER PILL (ESTUDO & LEITURA)
+       Arraste para baixo (swipe down) para ocultar mantendo o cronômetro ativo!
+       ===================================================== -->
+  <div id="spotify-mini-player" class="hidden fixed left-1/2 -translate-x-1/2 bottom-20 md:bottom-6 z-40 w-[92%] max-w-md rounded-2xl bg-[#160f29]/95 backdrop-blur-xl border border-purple-500/60 shadow-2xl px-4 py-3">
+    <div id="mini-player-drag-handle" class="w-10 h-1 rounded-full bg-purple-400/40 mx-auto mb-2 cursor-grab active:cursor-grabbing" title="Arraste para baixo para ocultar da tela"></div>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-purple-600/30 border border-purple-400/50 flex items-center justify-center text-purple-200 shrink-0">
+          <i data-lucide="play" id="mini-player-mode-icon" class="w-5 h-5"></i>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span id="mini-player-title" class="text-xs font-bold text-white truncate">Estudo Ativo</span>
+          </div>
+          <span id="mini-player-subtitle" class="text-[10px] text-purple-300 font-mono block truncate">Arraste p/ baixo p/ ocultar</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <span id="mini-player-timer" class="text-base font-mono font-extrabold text-emerald-400 tracking-wider px-2">00:00</span>
+        <button type="button" onclick="toggleActiveMiniPlayerTimer()" class="p-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white" title="Pausar / Continuar">
+          <i data-lucide="pause" id="mini-player-toggle-icon" class="w-4 h-4"></i>
+        </button>
+        <button type="button" onclick="finishActiveMiniPlayerTimer()" class="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white" title="Finalizar e Salvar">
+          <i data-lucide="check" class="w-4 h-4"></i>
+        </button>
+        <button type="button" onclick="dismissMiniPlayerKeepRunning()" class="p-1.5 rounded-lg text-slate-400 hover:text-white" title="Ocultar da tela (continua rodando)">
+          <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       OPÇÃO 7: SLIDE-OVER COMMAND DRAWER LATERAL (MOBILE & IPAD)
+       ===================================================== -->
+  <div id="mobile-command-drawer" class="hidden fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex justify-end">
+    <div class="w-72 max-w-[82vw] h-full bg-[#110c22]/95 backdrop-blur-2xl border-l border-purple-500/40 p-5 flex flex-col justify-between overflow-y-auto shadow-2xl">
+      <div class="space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <span class="text-[10px] font-mono uppercase text-purple-400">Roma • Command Center</span>
+            <h4 class="text-sm font-bold text-white">Menu de Ferramentas</h4>
+          </div>
+          <button type="button" onclick="toggleMobileCommandDrawer()" class="p-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-2">
+          <span class="text-[10px] font-mono uppercase text-slate-400 block">Trocar Perfil Ativo</span>
+          <div id="drawer-profiles-quick-list" class="space-y-1.5"></div>
+        </div>
+
+        <div class="space-y-1.5">
+          <span class="text-[10px] font-mono uppercase text-slate-400 px-1">Todos os Módulos</span>
+          <button type="button" onclick="switchTab('home'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i> Command Center (Início)
+          </button>
+          <button type="button" onclick="switchTab('study'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="clock" class="w-4 h-4 text-purple-400"></i> Estudos & Cronômetro
+          </button>
+          <button type="button" onclick="switchTab('reading'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i> Estúdio de Leitura
+          </button>
+          <button type="button" onclick="switchTab('couple'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="heart-handshake" class="w-4 h-4 text-pink-400"></i> Metas do Casal
+          </button>
+          <button type="button" onclick="switchTab('law'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="scale" class="w-4 h-4 text-amber-400"></i> Direito UEMG & Exec. Penal TJMG
+          </button>
+          <button type="button" onclick="switchTab('workouts'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="dumbbell" class="w-4 h-4 text-purple-400"></i> Academia & Cardio
+          </button>
+          <button type="button" onclick="switchTab('schedule'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="calendar-clock" class="w-4 h-4 text-purple-400"></i> Cronograma & Horários
+          </button>
+          <button type="button" onclick="switchTab('academic'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="graduation-cap" class="w-4 h-4 text-purple-400"></i> Notas, Livros & PDFs
+          </button>
+          <button type="button" onclick="switchTab('englab'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="cpu" class="w-4 h-4 text-purple-400"></i> Lab. de Engenharia
+          </button>
+          <button type="button" onclick="switchTab('coding'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="terminal" class="w-4 h-4 text-purple-400"></i> Programação (C / Python)
+          </button>
+          <button type="button" onclick="switchTab('profile'); toggleMobileCommandDrawer();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-purple-600/20">
+            <i data-lucide="user-circle" class="w-4 h-4 text-purple-400"></i> Meu Perfil & Metas
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-slate-800 space-y-2">
+        <button type="button" onclick="toggleMobileCommandDrawer(); openGoogleHubModal();" class="w-full py-2.5 px-3 rounded-xl bg-purple-600/30 border border-purple-500/40 text-xs font-semibold text-purple-200 flex items-center justify-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4"></i> Google & Gemini IA
+        </button>
+        <button type="button" onclick="toggleMobileCommandDrawer(); openSundayRecapModal();" class="w-full py-2 px-3 rounded-xl bg-slate-900 border border-amber-500/30 text-xs font-semibold text-amber-300 flex items-center justify-center gap-2">
+          <i data-lucide="award" class="w-4 h-4"></i> Card Resumo de Domingo
+        </button>
+      </div>
+    </div>
+  </div>
+
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-30 cold-glass border-t border-slate-800/90 px-1.5 py-1.5 flex items-center justify-around overflow-x-auto" aria-label="Navegação Mobile">
     <button type="button" onclick="switchTab('home')" id="mnav-home" class="flex flex-col items-center py-1 px-2 rounded-xl text-cyan-400">
       <i data-lucide="home" class="w-4 h-4"></i>
       <span class="text-[10px] font-medium mt-0.5">Início</span>
@@ -5039,6 +5367,7 @@
     const SUPABASE_URL = 'https://hekuzxekogampnylpzft.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_9jn67ZzEnMNF1X73r--Bxw_IsmeK4Zv';
     let cloudSyncDebounce = null;
+    let initialCloudSyncCompleted = false;
 
     function setCloudStatus(text, ok = true) {
       const lbl = document.getElementById('cloud-sync-label');
@@ -5121,7 +5450,7 @@
       if (!rows || rows.length === 0) {
         // First time: push local active profile up to Supabase
         await pushManifestToSupabase();
-        await pushProfileToSupabase(currentProfileId, state);
+        await if (initialCloudSyncCompleted) pushProfileToSupabase(currentProfileId, state);
         if (showFeedback) showToast('Conectado ao Supabase! Dados iniciais enviados para a nuvem.', 'success');
         return;
       }
@@ -5151,7 +5480,17 @@
           if (rawLocal) localTs = Number(JSON.parse(rawLocal)._updatedAt) || 0;
         } catch (e) {}
 
-        if (cloudTs > localTs) {
+        let localHasData = false;
+        try {
+          const rawL = localStorage.getItem(getStorageKeyForProfile(r.profile_id));
+          if (rawL) {
+            const pL = JSON.parse(rawL);
+            localHasData = Boolean((pL.books && pL.books.length) || (pL.notes && pL.notes.length) || (pL.readingLogs && pL.readingLogs.length) || (pL.studySessions && pL.studySessions.length) || (pL.pdfs && pL.pdfs.length));
+          }
+        } catch (e) {}
+        const cloudHasData = Boolean((cloudState.books && cloudState.books.length) || (cloudState.notes && cloudState.notes.length) || (cloudState.readingLogs && cloudState.readingLogs.length) || (cloudState.studySessions && cloudState.studySessions.length) || (cloudState.pdfs && cloudState.pdfs.length));
+
+        if (cloudTs > localTs || (cloudHasData && !localHasData)) {
           try {
             localStorage.setItem(getStorageKeyForProfile(r.profile_id), JSON.stringify(cloudState));
           } catch (e) {}
@@ -5161,6 +5500,7 @@
         }
       });
 
+      initialCloudSyncCompleted = true;
       setCloudStatus('Nuvem Sincronizada ✓', true);
       syncProfileUI();
       renderMultiProfilesGrid();
@@ -5177,9 +5517,10 @@
     }
 
     function scheduleCloudPush() {
+      if (!initialCloudSyncCompleted) return;
       clearTimeout(cloudSyncDebounce);
       cloudSyncDebounce = setTimeout(() => {
-        pushProfileToSupabase(currentProfileId, state);
+        if (initialCloudSyncCompleted) pushProfileToSupabase(currentProfileId, state);
       }, 850);
     }
 
@@ -5550,6 +5891,8 @@
     }
 
     function renderHome() {
+      updateCompactReadingPlayerUI();
+      renderProfileAdaptiveCommandWidget();
       syncProfileUI();
       ensureSchedulePeriodInitialized();
       updateBadgesAndKPIs();
@@ -6202,6 +6545,430 @@
     }
 
 
+
+    // ==========================================
+    // OPÇÃO 7: COMMAND BAR, MINI-PLAYER SPOTIFY COM SWIPE-DOWN & WIDGETS POR PERFIL
+    // ==========================================
+    let miniPlayerDismissed = false;
+    let activeMiniPlayerMode = null; // 'study' | 'reading'
+
+    function syncSpotifyMiniPlayer() {
+      const pill = document.getElementById('spotify-mini-player');
+      const mobRestoreBtn = document.getElementById('restore-mini-player-btn');
+      const dskRestoreBtn = document.getElementById('desktop-restore-mini-player-btn');
+      if (!pill) return;
+
+      const isStudyActive = studyTimerRunning || studyTimerSec > 0;
+      const isReadingActive = readingStopwatchRunning || readingStopwatchSec > 0;
+
+      if (!isStudyActive && !isReadingActive) {
+        pill.classList.add('hidden');
+        pill.classList.remove('swiped-down');
+        if (mobRestoreBtn) mobRestoreBtn.classList.add('hidden');
+        if (dskRestoreBtn) dskRestoreBtn.classList.add('hidden');
+        miniPlayerDismissed = false;
+        activeMiniPlayerMode = null;
+        return;
+      }
+
+      if (readingStopwatchRunning) activeMiniPlayerMode = 'reading';
+      else if (studyTimerRunning) activeMiniPlayerMode = 'study';
+      else if (isReadingActive) activeMiniPlayerMode = 'reading';
+      else activeMiniPlayerMode = 'study';
+
+      let titleText = '';
+      let formattedTime = '00:00';
+      let isRunningNow = false;
+
+      if (activeMiniPlayerMode === 'reading') {
+        const bName = (state.currentBook && state.currentBook.title) || document.getElementById('read-log-book')?.value || 'Leitura Atual';
+        titleText = `Leitura • ${bName}`;
+        const m = String(Math.floor(readingStopwatchSec / 60)).padStart(2, '0');
+        const sec = String(readingStopwatchSec % 60).padStart(2, '0');
+        formattedTime = `${m}:${sec}`;
+        isRunningNow = readingStopwatchRunning;
+      } else {
+        const sName = state.activeStudySubject || 'Estudo Geral';
+        titleText = `Estudo • ${sName}`;
+        const h = Math.floor(studyTimerSec / 3600);
+        const m = String(Math.floor((studyTimerSec % 3600) / 60)).padStart(2, '0');
+        const sec = String(studyTimerSec % 60).padStart(2, '0');
+        formattedTime = h > 0 ? `${h}:${m}:${sec}` : `${m}:${sec}`;
+        isRunningNow = studyTimerRunning;
+      }
+
+      const tEl = document.getElementById('mini-player-title');
+      const sEl = document.getElementById('mini-player-subtitle');
+      const tmEl = document.getElementById('mini-player-timer');
+      const togIcon = document.getElementById('mini-player-toggle-icon');
+      if (tEl) tEl.textContent = titleText;
+      if (sEl) sEl.textContent = isRunningNow ? 'Rodando • Arraste p/ baixo p/ ocultar' : 'Pausado • Toque para retomar';
+      if (tmEl) tmEl.textContent = formattedTime;
+      if (togIcon) togIcon.setAttribute('data-lucide', isRunningNow ? 'pause' : 'play');
+
+      const mobTime = document.getElementById('restore-mini-player-time');
+      const dskTime = document.getElementById('desktop-restore-mini-player-time');
+      if (mobTime) mobTime.textContent = formattedTime;
+      if (dskTime) dskTime.textContent = formattedTime;
+
+      pill.classList.remove('hidden');
+      if (miniPlayerDismissed) {
+        pill.classList.add('swiped-down');
+        if (mobRestoreBtn) { mobRestoreBtn.classList.remove('hidden'); mobRestoreBtn.classList.add('inline-flex'); }
+        if (dskRestoreBtn) { dskRestoreBtn.classList.remove('hidden'); dskRestoreBtn.classList.add('inline-flex'); }
+      } else {
+        pill.classList.remove('swiped-down');
+        if (mobRestoreBtn) mobRestoreBtn.classList.add('hidden');
+        if (dskRestoreBtn) dskRestoreBtn.classList.add('hidden');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function dismissMiniPlayerKeepRunning() {
+      miniPlayerDismissed = true;
+      syncSpotifyMiniPlayer();
+      showToast('Mini-player ocultado! O cronômetro continua rodando em segundo plano.');
+    }
+
+    function restoreMiniPlayer() {
+      miniPlayerDismissed = false;
+      syncSpotifyMiniPlayer();
+    }
+
+    function toggleActiveMiniPlayerTimer() {
+      if (activeMiniPlayerMode === 'reading') {
+        toggleReadingStopwatch();
+      } else {
+        toggleStudySessionTimer();
+      }
+      syncSpotifyMiniPlayer();
+    }
+
+    function finishActiveMiniPlayerTimer() {
+      if (activeMiniPlayerMode === 'reading') {
+        finishReadingStopwatchSession();
+      } else {
+        finishAndLogStudyTimer();
+      }
+      miniPlayerDismissed = false;
+      syncSpotifyMiniPlayer();
+    }
+
+    function initMiniPlayerSwipeGesture() {
+      const pill = document.getElementById('spotify-mini-player');
+      if (!pill) return;
+      let startY = 0;
+      let currentDeltaY = 0;
+      let dragging = false;
+
+      pill.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches[0]) return;
+        startY = e.touches[0].clientY;
+        currentDeltaY = 0;
+        dragging = true;
+      }, { passive: true });
+
+      pill.addEventListener('touchmove', (e) => {
+        if (!dragging || !e.touches || !e.touches[0]) return;
+        currentDeltaY = e.touches[0].clientY - startY;
+        if (currentDeltaY > 8) {
+          pill.style.transform = `translate(-50%, ${currentDeltaY}px)`;
+        }
+      }, { passive: true });
+
+      pill.addEventListener('touchend', () => {
+        if (!dragging) return;
+        dragging = false;
+        pill.style.transform = '';
+        if (currentDeltaY > 36) {
+          dismissMiniPlayerKeepRunning();
+        }
+      });
+
+      pill.addEventListener('mousedown', (e) => {
+        startY = e.clientY;
+        currentDeltaY = 0;
+        dragging = true;
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        currentDeltaY = e.clientY - startY;
+        if (currentDeltaY > 8) {
+          pill.style.transform = `translate(-50%, ${currentDeltaY}px)`;
+        }
+      });
+      window.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false;
+        pill.style.transform = '';
+        if (currentDeltaY > 36) {
+          dismissMiniPlayerKeepRunning();
+        }
+      });
+    }
+
+    function updateCompactReadingPlayerUI() {
+      const cb = state.currentBook || { title: '', currentPage: 0, totalPages: 300 };
+      const rLogs = state.readingLogs || [];
+      const totalPages = rLogs.reduce((a, b) => a + (Number(b.pages) || 0), 0);
+      const totalMins = rLogs.reduce((a, b) => a + (Number(b.mins) || 0), 0);
+      const spd = totalMins > 0 ? ((totalPages / totalMins) * 60).toFixed(0) : '30';
+
+      const bookTitle = (cb.title && cb.title.trim()) || (rLogs[0] && rLogs[0].book) || 'Toque em "Editar livro/pág." para escolher';
+      const curPage = Number(cb.currentPage) || 0;
+      const totPage = Math.max(1, Number(cb.totalPages) || 300);
+      const pct = Math.min(100, Math.round((curPage / totPage) * 100));
+
+      const pTag = document.getElementById('home-reader-profile-tag');
+      const tEl = document.getElementById('home-compact-book-title');
+      const mEl = document.getElementById('home-compact-book-mini');
+      const pgEl = document.getElementById('home-compact-book-pages');
+      const barEl = document.getElementById('home-compact-book-bar');
+      const pctEl = document.getElementById('home-compact-book-pct');
+      const playBtn = document.getElementById('home-compact-reading-play-btn');
+
+      if (pTag) pTag.textContent = (state.profile && state.profile.name) || 'Meu Perfil';
+      if (tEl) tEl.textContent = bookTitle;
+      if (mEl) mEl.textContent = (cb.title && cb.title.trim()) ? cb.title.slice(0, 18) : 'ROMA BOOK';
+      if (pgEl) pgEl.textContent = `Página ${curPage} de ${totPage} • Velocidade: ${spd} pág/h`;
+      if (barEl) barEl.style.width = `${pct}%`;
+      if (pctEl) pctEl.textContent = `${pct}% concluído`;
+      if (playBtn) {
+        playBtn.innerHTML = readingStopwatchRunning
+          ? `<i data-lucide="pause" class="w-5 h-5"></i>`
+          : `<i data-lucide="play" class="w-5 h-5 fill-current"></i>`;
+      }
+    }
+
+    function startOrToggleReadingFromCompactPlayer() {
+      miniPlayerDismissed = false;
+      toggleReadingStopwatch();
+      updateCompactReadingPlayerUI();
+      syncSpotifyMiniPlayer();
+      if (readingStopwatchRunning) {
+        showToast('Cronômetro de leitura iniciado no Mini-Player!', 'success');
+      }
+    }
+
+    function promptQuickUpdateCurrentBook() {
+      switchTab('reading');
+      setReadingSubtab('diary');
+      setTimeout(() => {
+        const inp = document.getElementById('current-reading-title');
+        if (inp) inp.focus();
+      }, 120);
+    }
+
+    function isLawProfileActive() {
+      const course = ((state.profile && state.profile.course) || '').toLowerCase();
+      const name = ((state.profile && state.profile.name) || '').toLowerCase();
+      return currentProfileId === 'profile_2' || course.includes('direito') || course.includes('uemg') || name.includes('direito') || name.includes('namorada');
+    }
+
+    function renderProfileAdaptiveCommandWidget() {
+      const box = document.getElementById('profile-adaptive-command-widget');
+      const mobShort = document.getElementById('mobile-active-profile-short');
+      if (mobShort) {
+        mobShort.textContent = isLawProfileActive() ? 'Direito UEMG' : 'Eng. Comp.';
+      }
+      if (!box) return;
+
+      if (isLawProfileActive()) {
+        box.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-[10px] font-mono uppercase text-amber-300">Command Widget • Direito UEMG & TJMG</span>
+            <button type="button" onclick="switchTab('law')" class="text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1">
+              Abrir Hub Execução Penal <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-amber-500/30 space-y-1">
+              <span class="text-[10px] font-mono uppercase text-amber-300">Calculadora LEP / SEEU</span>
+              <p class="text-xs font-bold text-white">Remição & Progressão</p>
+              <p class="text-[11px] text-slate-400">Art. 112 (16% a 70%) e Art. 126 LEP</p>
+              <button type="button" onclick="switchTab('law')" class="mt-1 text-[11px] font-semibold text-purple-300 hover:underline">Calcular agora →</button>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-1">
+              <span class="text-[10px] font-mono uppercase text-purple-300">Pena de Multa & Custas</span>
+              <p class="text-xs font-bold text-white">Dias-Multa (Art. 49 CP)</p>
+              <p class="text-[11px] text-slate-400">Fração SM + Custas TJMG prontas p/ colar</p>
+              <button type="button" onclick="switchTab('law')" class="mt-1 text-[11px] font-semibold text-purple-300 hover:underline">Gerar certidão →</button>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-pink-500/30 space-y-1">
+              <span class="text-[10px] font-mono uppercase text-pink-300">Metas do Casal</span>
+              <p class="text-xs font-bold text-white">Ver Progresso Conjunto</p>
+              <p class="text-[11px] text-slate-400">Leitura, treinos e estudos sincronizados</p>
+              <button type="button" onclick="switchTab('couple')" class="mt-1 text-[11px] font-semibold text-pink-300 hover:underline">Comparar ao vivo →</button>
+            </div>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-[10px] font-mono uppercase text-purple-300">Command Widget • Engenharia de Computação</span>
+            <button type="button" onclick="switchTab('study')" class="text-xs font-semibold text-purple-300 hover:text-white flex items-center gap-1">
+              Cronômetro de Estudos <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-1">
+              <span class="text-[10px] font-mono uppercase text-purple-300">Lab. Engenharia</span>
+              <p class="text-xs font-bold text-white">Bases, IEEE-754 & Verdade</p>
+              <p class="text-[11px] text-slate-400">Conversor Bin/Hex e portas lógicas</p>
+              <button type="button" onclick="switchTab('englab')" class="mt-1 text-[11px] font-semibold text-purple-300 hover:underline">Abrir Lab →</button>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 space-y-1">
+              <span class="text-[10px] font-mono uppercase text-emerald-300">IDE Código C & Python</span>
+              <p class="text-xs font-bold text-white">Trilha Guiada + Sandbox</p>
+              <p class="text-[11px] text-slate-400">Pratique ponteiros, structs e TADs</p>
+              <button type="button" onclick="switchTab('coding')" class="mt-1 text-[11px] font-semibold text-emerald-300 hover:underline">Codar agora →</button>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-pink-500/30 space-y-1">
+              <span class="text-[10px] font-mono uppercase text-pink-300">Metas do Casal</span>
+              <p class="text-xs font-bold text-white">Você & Sua Namorada</p>
+              <p class="text-[11px] text-slate-400">Sincronizado em tempo real no Supabase</p>
+              <button type="button" onclick="switchTab('couple')" class="mt-1 text-[11px] font-semibold text-pink-300 hover:underline">Ver placar →</button>
+            </div>
+          </div>
+        `;
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function quickTogglePartnerProfile() {
+      if (profilesManifest.length < 2) {
+        openProfileSwitchModal();
+        return;
+      }
+      const nextProf = profilesManifest.find(p => p.id !== currentProfileId) || profilesManifest[0];
+      switchProfile(nextProf.id);
+    }
+
+    function toggleMobileCommandDrawer() {
+      const drw = document.getElementById('mobile-command-drawer');
+      if (!drw) return;
+      drw.classList.toggle('hidden');
+      const listEl = document.getElementById('drawer-profiles-quick-list');
+      if (listEl) {
+        listEl.innerHTML = profilesManifest.map(p => {
+          const isAct = p.id === currentProfileId;
+          return `
+            <button type="button" onclick="switchProfile('${p.id}'); toggleMobileCommandDrawer();" class="w-full px-3 py-2 rounded-xl flex items-center justify-between text-xs border ${isAct ? 'bg-purple-600/30 border-purple-400 text-white font-bold' : 'bg-slate-950 border-slate-800 text-slate-300'}">
+              <span class="truncate">👤 ${escapeHtml(p.name)}</span>
+              ${isAct ? '<span class="text-[10px] text-emerald-400">Ativo</span>' : '<span class="text-[10px] text-purple-300">Trocar</span>'}
+            </button>
+          `;
+        }).join('');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function handleCommandBarSubmit(rawQuery) {
+      const q = (rawQuery || '').trim();
+      if (!q) {
+        openGoogleHubModal();
+        return;
+      }
+      const ql = q.toLowerCase();
+      if (ql.includes('lep') || ql.includes('multa') || ql.includes('remição') || ql.includes('remicao') || ql.includes('tjmg') || ql.includes('direito') || ql.includes('prazo')) {
+        switchTab('law');
+        showToast(`Abrindo Hub Direito UEMG / TJMG para: "${q}"`, 'success');
+        return;
+      }
+      if (ql.includes('casal') || ql.includes('namorada')) {
+        switchTab('couple');
+        return;
+      }
+      if (ql.includes('ler') || ql.includes('livro') || ql.includes('leitura') || ql.includes('wishlist')) {
+        switchTab('reading');
+        return;
+      }
+      if (ql.includes('estudo') || ql.includes('cronômetro') || ql.includes('cronometro')) {
+        switchTab('study');
+        return;
+      }
+      openGoogleHubModal();
+      const box = document.getElementById('gemini-prompt-textarea');
+      if (box) box.value = q;
+    }
+
+    function computeTjmgExecucaoPenal() {
+      const diasMulta = Math.max(1, parseInt(document.getElementById('tjmg-dias-multa')?.value, 10) || 10);
+      const divisorFracao = Math.max(1, parseInt(document.getElementById('tjmg-fracao-multa')?.value, 10) || 30);
+      const salMin = Math.max(1, parseFloat(document.getElementById('tjmg-salario-base')?.value) || 1518);
+      const custas = Math.max(0, parseFloat(document.getElementById('tjmg-custas-val')?.value) || 0);
+
+      const valorDiaMulta = salMin / divisorFracao;
+      const totalMulta = diasMulta * valorDiaMulta;
+      const totalGeral = totalMulta + custas;
+
+      const mRes = document.getElementById('tjmg-multa-result');
+      if (mRes) {
+        mRes.textContent = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      }
+
+      const dTrab = Math.max(0, parseInt(document.getElementById('tjmg-rem-trab')?.value, 10) || 0);
+      const hEst = Math.max(0, parseInt(document.getElementById('tjmg-rem-estudo')?.value, 10) || 0);
+      const livros = Math.max(0, parseInt(document.getElementById('tjmg-rem-livros')?.value, 10) || 0);
+
+      const remTrab = Math.floor(dTrab / 3);
+      const sobraTrab = dTrab % 3;
+      const remEst = Math.floor(hEst / 12);
+      const sobraEst = hEst % 12;
+      const remLiv = livros * 4;
+      const totalRemidos = remTrab + remEst + remLiv;
+
+      const rRes = document.getElementById('tjmg-remicao-result');
+      const rSob = document.getElementById('tjmg-remicao-sobra');
+      if (rRes) rRes.textContent = `${totalRemidos} dias remidos`;
+      if (rSob) rSob.textContent = `Sobras p/ próximo cálculo: ${sobraTrab}d trab / ${sobraEst}h estudo`;
+
+      const anos = Math.max(0, parseInt(document.getElementById('tjmg-pena-anos')?.value, 10) || 0);
+      const meses = Math.max(0, parseInt(document.getElementById('tjmg-pena-meses')?.value, 10) || 0);
+      const pct = Math.max(1, parseInt(document.getElementById('tjmg-lep-pct')?.value, 10) || 16);
+
+      const totalPenaDias = (anos * 365) + (meses * 30);
+      const reqBrutoDias = Math.ceil(totalPenaDias * (pct / 100));
+      const reqLiquidoDias = Math.max(0, reqBrutoDias - totalRemidos);
+
+      const pAnos = Math.floor(reqBrutoDias / 365);
+      const pMeses = Math.floor((reqBrutoDias % 365) / 30);
+      const pDias = (reqBrutoDias % 365) % 30;
+
+      const pRes = document.getElementById('tjmg-prog-result');
+      const pLiq = document.getElementById('tjmg-prog-liquido');
+      if (pRes) pRes.textContent = `${reqBrutoDias} dias (${pAnos}a ${pMeses}m ${pDias}d)`;
+      if (pLiq) pLiq.textContent = `Descontando ${totalRemidos}d de remição: ${reqLiquidoDias} dias`;
+    }
+
+    function copyTjmgCertidao() {
+      computeTjmgExecucaoPenal();
+      const diasMulta = document.getElementById('tjmg-dias-multa')?.value || 10;
+      const divisor = document.getElementById('tjmg-fracao-multa')?.value || 30;
+      const salMin = document.getElementById('tjmg-salario-base')?.value || 1518;
+      const custas = document.getElementById('tjmg-custas-val')?.value || 0;
+      const multaTotal = document.getElementById('tjmg-multa-result')?.textContent || '';
+      const remTotal = document.getElementById('tjmg-remicao-result')?.textContent || '';
+      const remSobra = document.getElementById('tjmg-remicao-sobra')?.textContent || '';
+      const progTotal = document.getElementById('tjmg-prog-result')?.textContent || '';
+      const progLiq = document.getElementById('tjmg-prog-liquido')?.textContent || '';
+
+      const texto = [
+        "=== MEMÓRIA DE CÁLCULO — EXECUÇÃO PENAL (TJMG / SEEU) ===",
+        `1. PENA DE MULTA E CUSTAS (Art. 49 do CP): ${diasMulta} dias-multa à razão de 1/${divisor} do salário mínimo (R$ ${salMin}), somado às custas processuais de R$ ${custas} = Total devido de ${multaTotal}.`,
+        `2. REMIÇÃO DE PENA (Art. 126 da LEP): ${remTotal} (${remSobra}).`,
+        `3. REQUISITO OBJETIVO PARA PROGRESSÃO DE REGIME (Art. 112 da LEP): ${progTotal} (${progLiq}).`
+      ].join("\n");
+
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      showToast('Memória de cálculo copiada! Pronta para colar no SEEU / PJe.', 'success');
+    }
+
     // ==========================================
     // LEITURA: SUB-ABAS, PROGRESSO %, WISHLIST & CITAÇÕES
     // ==========================================
@@ -6227,6 +6994,7 @@
       state.currentBook.currentPage = Math.max(0, parseInt(document.getElementById('current-reading-page')?.value, 10) || 0);
       state.currentBook.totalPages = Math.max(1, parseInt(document.getElementById('current-reading-total')?.value, 10) || 1);
       updateCurrentBookProgressUI();
+      updateCompactReadingPlayerUI();
       saveState();
     }
 
@@ -6418,6 +7186,7 @@
         studyTimerInterval = setInterval(() => {
           studyTimerSec++;
           updateStudyTimerDisplay();
+          syncSpotifyMiniPlayer();
         }, 1000);
       } else {
         clearInterval(studyTimerInterval);
@@ -6439,6 +7208,7 @@
       studyTimerRunning = false;
       studyTimerSec = 0;
       updateStudyTimerDisplay();
+      syncSpotifyMiniPlayer();
       const btn = document.getElementById('study-timer-start-btn');
       if (btn) btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> <span>Iniciar Estudo</span>`;
       if (window.lucide) lucide.createIcons();
@@ -6806,6 +7576,7 @@
 
     function renderLawTab() {
       calculateLegalDeadline();
+      computeTjmgExecucaoPenal();
       const listEl = document.getElementById('law-entries-list');
       if (!listEl) return;
       const entries = state.lawEntries || [];
@@ -7649,13 +8420,21 @@
       if (new Date().getDay() === 0) { setTimeout(openSundayRecapModal, 600); }
       updatePomodoroDisplay();
       if (window.lucide) lucide.createIcons();
+      initMiniPlayerSwipeGesture();
+      syncSpotifyMiniPlayer();
       syncAllFromSupabase(false);
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          if (reg) reg.update().catch(() => {});
+        });
+      }
+
     });
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         saveState();
-        pushProfileToSupabase(currentProfileId, state);
+        if (initialCloudSyncCompleted) pushProfileToSupabase(currentProfileId, state);
       }
     });
     window.addEventListener('pagehide', () => {
