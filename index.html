@@ -5803,6 +5803,8 @@
       setCloudStatus('Nuvem Sincronizada ✓', true);
       syncProfileUI();
       applyTheme();
+      if (typeof updateCurrentBookProgressUI === 'function') updateCurrentBookProgressUI();
+      if (typeof updateCompactReadingPlayerUI === 'function') updateCompactReadingPlayerUI();
       renderMultiProfilesGrid();
       const activeTab = state.activeTab || 'home';
       if (activeTab === 'home') renderHome();
@@ -5916,6 +5918,8 @@
       saveState();
       syncProfileUI();
       applyTheme();
+      if (typeof updateCurrentBookProgressUI === 'function') updateCurrentBookProgressUI();
+      if (typeof updateCompactReadingPlayerUI === 'function') updateCompactReadingPlayerUI();
       renderMultiProfilesGrid();
       switchTab('home');
       showToast(`Bem-vindo(a), ${name}! Perfil individual ativo no Roma.`, 'success');
@@ -5951,6 +5955,8 @@
       saveState(false);
       syncProfileUI();
       applyTheme();
+      if (typeof updateCurrentBookProgressUI === 'function') updateCurrentBookProgressUI();
+      if (typeof updateCompactReadingPlayerUI === 'function') updateCompactReadingPlayerUI();
       renderMultiProfilesGrid();
       switchTab(state.activeTab || 'home');
       syncAllFromSupabase(false);
@@ -8782,6 +8788,8 @@
       await loadState();
       syncProfileUI();
       applyTheme();
+      if (typeof updateCurrentBookProgressUI === 'function') updateCurrentBookProgressUI();
+      if (typeof updateCompactReadingPlayerUI === 'function') updateCompactReadingPlayerUI();
       if (state.largeText) {
         document.documentElement.style.fontSize = '17.5px';
         const lbl = document.getElementById('font-scale-label');
@@ -8798,7 +8806,7 @@
       if ('caches' in window) {
         caches.keys().then(keys => {
           keys.forEach(k => {
-            if (k !== 'roma-pwa-v6') caches.delete(k).catch(() => {});
+            if (k !== 'roma-pwa-v7') caches.delete(k).catch(() => {});
           });
         }).catch(() => {});
       }
@@ -8811,12 +8819,31 @@
 
     });
 
+    let lastAutoCloudPullAt = 0;
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         saveState();
         if (initialCloudSyncCompleted) pushProfileToSupabase(currentProfileId, state);
+      } else if (document.visibilityState === 'visible') {
+        const now = Date.now();
+        if (now - lastAutoCloudPullAt > 4000) {
+          lastAutoCloudPullAt = now;
+          syncAllFromSupabase(false);
+        }
       }
     });
+    window.addEventListener('focus', () => {
+      const now = Date.now();
+      if (now - lastAutoCloudPullAt > 4000) {
+        lastAutoCloudPullAt = now;
+        syncAllFromSupabase(false);
+      }
+    });
+    setInterval(() => {
+      if (document.visibilityState === 'visible' && navigator.onLine !== false) {
+        syncAllFromSupabase(false);
+      }
+    }, 25000);
     window.addEventListener('pagehide', () => {
       saveState();
     });
